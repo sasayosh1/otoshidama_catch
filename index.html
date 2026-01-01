@@ -242,16 +242,21 @@
     /* Item Manifest Panel */
     .item-manifest {
       margin-top: 1rem;
-      width: 100vw;
-      overflow: visible;
+      width: 90%;
+      max-width: 360px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 1rem;
     }
 
     .item-manifest h3 {
       font-size: 1rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.8rem;
       color: var(--gold-light);
       text-align: center;
       letter-spacing: 0.1em;
@@ -260,14 +265,17 @@
 
     .manifest-scroll {
       display: flex;
-      gap: 1rem;
-      padding: 0.5rem 2rem;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 0 0.5rem;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
       -webkit-overflow-scrolling: touch;
       width: 100%;
-      scrollbar-width: none;
-      /* Hide scrollbar Firefox */
+      max-height: 180px;
+      /* Constrain height for vertical scroll */
+      scrollbar-width: thin;
+      scrollbar-color: var(--gold) transparent;
     }
 
     .manifest-scroll::-webkit-scrollbar {
@@ -276,34 +284,35 @@
     }
 
     .manifest-card {
-      flex: 0 0 160px;
-      scroll-snap-align: center;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(12px);
-      padding: 1rem;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.8rem 1.2rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
       color: white;
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
       align-items: center;
-      gap: 0.5rem;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      width: 100%;
     }
 
     .manifest-emoji {
-      font-size: 2rem;
+      font-size: 1.5rem;
+      width: 2.5rem;
+      text-align: center;
     }
 
     .manifest-info {
-      font-size: 0.85rem;
+      flex: 1;
+      font-size: 0.9rem;
       font-weight: bold;
-      text-align: center;
-      line-height: 1.2;
+      margin-left: 0.5rem;
+      text-align: left;
     }
 
     .manifest-rate {
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       opacity: 0.7;
     }
 
@@ -409,29 +418,29 @@
     <div class="footer-container">
       <button class="btn-start" id="startBtn">開運! START</button>
 
-      <!-- Item Manifest (Swipeable on mobile) -->
+      <!-- Item Manifest (Vertical Scroll) -->
       <div class="item-manifest">
-        <h3>招福アイテム図鑑 (左右にスワイプ)</h3>
+        <h3>招福アイテム図鑑</h3>
         <div class="manifest-scroll">
           <div class="manifest-card item-rare">
             <span class="manifest-emoji">✨</span>
-            <span class="manifest-info">奇跡の瑞光<br>+10,000円</span>
-            <span class="manifest-rate">出現率 5%</span>
+            <span class="manifest-info">奇跡の瑞光: +10,000円</span>
+            <span class="manifest-rate">5%</span>
           </div>
           <div class="manifest-card item-good">
             <span class="manifest-emoji">💴</span>
-            <span class="manifest-info">開運紙幣<br>+1,000円</span>
-            <span class="manifest-rate">出現率 30%</span>
+            <span class="manifest-info">開運紙幣: +1,000円</span>
+            <span class="manifest-rate">30%</span>
           </div>
           <div class="manifest-card">
             <span class="manifest-emoji">🪙</span>
-            <span class="manifest-info">幸運硬貨<br>+500円</span>
-            <span class="manifest-rate">出現率 50%</span>
+            <span class="manifest-info">幸運硬貨: +500円</span>
+            <span class="manifest-rate">50%</span>
           </div>
           <div class="manifest-card item-bad">
             <span class="manifest-emoji">💸</span>
-            <span class="manifest-info">不運の散札<br>-1,000円</span>
-            <span class="manifest-rate">出現率 15%</span>
+            <span class="manifest-info">不運の散札: -1,000円</span>
+            <span class="manifest-rate">15%</span>
           </div>
         </div>
       </div>
