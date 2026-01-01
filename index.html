@@ -423,7 +423,6 @@
       background: #000;
       color: white;
       overflow: hidden;
-      display: none;
       align-items: center;
       justify-content: center;
       text-align: center;
@@ -481,6 +480,59 @@
       -webkit-text-fill-color: transparent;
       color: var(--gold);
       /* Fallback */
+    }
+
+    /* Stage Overlay */
+    #stageOverlay {
+      position: absolute;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      color: white;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    #stageOverlay.active {
+      display: flex;
+    }
+
+    .stage-title-large {
+      font-size: 3.5rem;
+      font-weight: 900;
+      margin-bottom: 0.5rem;
+      color: var(--gold-light);
+      text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+    }
+
+    .stage-status-msg {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 2rem;
+      letter-spacing: 0.3rem;
+    }
+
+    .btn-next-stage {
+      padding: 1.2rem 3rem;
+      background: var(--gold);
+      color: var(--ink);
+      border: none;
+      border-radius: 9999px;
+      font-size: 1.5rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+      transition: all 0.2s;
+    }
+
+    .btn-next-stage:hover {
+      transform: scale(1.1);
+      background: var(--gold-light);
     }
   </style>
 </head>
@@ -552,6 +604,13 @@
     <canvas id="gameCanvas"></canvas>
     <!-- Player Cursor Video -->
     <video id="cursorVideo" src="cursor.mp4" loop muted playsinline></video>
+
+    <!-- Stage Overlay -->
+    <div id="stageOverlay">
+      <div id="stageTitleLarge" class="stage-title-large">壱の段</div>
+      <div id="stageStatusMsg" class="stage-status-msg">スタート</div>
+      <button id="nextStageBtn" class="btn-next-stage">次へ進む</button>
+    </div>
   </div>
 
   <!-- Result View -->
@@ -642,7 +701,9 @@
       stageTimer: 0,
       gameActive: false,
       lastSpawn: 0,
-      isEnding: false
+      isEnding: false,
+      isPaused: false,
+      timerId: null
     };
 
     const $ = (id) => document.getElementById(id);
@@ -700,10 +761,22 @@
       window.addEventListener('mousemove', handleMove);
       window.addEventListener('touchmove', handleMove, { passive: false });
 
-      $('startBtn').onclick = startGame;
+      $('startBtn').onclick = () => {
+        state.stageIndex = 0;
+        state.score = 0;
+        startStage(0);
+      };
+      $('nextStageBtn').onclick = () => {
+        if (state.stageIndex < CONFIG.stages.length - 1) {
+          state.stageIndex++;
+          startStage(state.stageIndex);
+        } else {
+          endGame();
+        }
+      };
       $('endingBtn').onclick = showEnding;
       $('endToStartBtn').onclick = () => {
-        location.reload(); // Simple way to reset everything for the next run
+        location.reload();
       };
       $('retryBtn').onclick = () => {
         $('resultBgVideoLeft').pause();
@@ -718,34 +791,79 @@
       state.playerX = canvas.width / 2;
     }
 
-    function startGame() {
-      Audio.play('start');
-      state.score = 0;
+    function startStage(index) {
+      state.stageIndex = index;
+      const stage = CONFIG.stages[index];
       state.timeLeft = CONFIG.gameTime;
       state.items = [];
-      state.stageIndex = 0;
-      state.stageTimer = 0;
       state.gameActive = true;
-      state.lastSpawn = 0; // Reset to 0 to work with rAF timestamp
+      state.isPaused = false;
+      state.lastSpawn = performance.now();
 
-      $('scoreValue').textContent = '¥0';
+      // Update HUD
+      updateHUD();
+      $('scoreValue').textContent = `¥${state.score.toLocaleString()}`;
       $('timeValue').textContent = state.timeLeft;
-      updateHUD(); // Initialize HUD with first stage info
 
+      // Show View & Overlay
       showView('game');
       cursorVideo.style.display = 'block';
       cursorVideo.play();
 
-      requestAnimationFrame(gameLoop);
+      // Stage Start Overlay
+      const kanji = ["壱", "弐", "参", "肆", "最終"];
+      showStageOverlay(`${kanji[index]}の段`, "スタート", "挑戦開始", () => {
+        hideStageOverlay();
+        startTimer();
+        if (index === 0) requestAnimationFrame(gameLoop);
+      });
+    }
 
-      const timer = setInterval(() => {
-        state.timeLeft--;
-        $('timeValue').textContent = state.timeLeft;
-        if (state.timeLeft <= 0) {
-          clearInterval(timer);
-          endGame();
+    function startTimer() {
+      if (state.timerId) clearInterval(state.timerId);
+      state.timerId = setInterval(() => {
+        if (!state.isPaused) {
+          state.timeLeft--;
+          $('timeValue').textContent = state.timeLeft;
+          if (state.timeLeft <= 0) {
+            clearInterval(state.timerId);
+            endGame();
+          }
         }
       }, 1000);
+    }
+
+    function showStageOverlay(title, msg, btnText, callback) {
+      state.isPaused = true;
+      $('stageTitleLarge').textContent = title;
+      $('stageStatusMsg').textContent = msg;
+      $('nextStageBtn').textContent = btnText;
+      $('stageOverlay').classList.add('active');
+      $('nextStageBtn').onclick = callback;
+    }
+
+    function hideStageOverlay() {
+      state.isPaused = false;
+      $('stageOverlay').classList.remove('active');
+    }
+
+    function triggerStageClear() {
+      state.isPaused = true;
+      clearInterval(state.timerId);
+      Audio.play('start');
+      flash();
+
+      const kanji = ["壱", "弐", "参", "肆", "最終"];
+      const isLast = state.stageIndex === CONFIG.stages.length - 1;
+      showStageOverlay(`${kanji[state.stageIndex]}の段`, "クリア！", isLast ? "運勢鑑定へ" : "次へ進む", () => {
+        if (isLast) {
+          endGame();
+        } else {
+          hideStageOverlay();
+          state.stageIndex++;
+          startStage(state.stageIndex);
+        }
+      });
     }
 
     function endGame() {
@@ -810,25 +928,18 @@
     }
 
     function gameLoop(timestamp) {
-      if (!state.gameActive) return;
+      if (!state.gameActive && !state.isEnding) return;
 
       const currentStage = CONFIG.stages[state.stageIndex];
 
       // Check Stage Completion
-      if (state.score >= currentStage.target && state.stageIndex < CONFIG.stages.length - 1) {
-        state.stageIndex++;
-        const nextStage = CONFIG.stages[state.stageIndex];
-        state.timeLeft += 10; // Bonus time
-        createStageBanner(`CLEAR! 次: ${nextStage.name}`);
-        Audio.play('start');
-        updateHUD();
-      } else if (state.score >= currentStage.target && state.stageIndex === CONFIG.stages.length - 1) {
-        // Final goal reached - keep playing but maybe stop spawning? 
-        // For now, just continue in Stage 5
+      if (state.score >= currentStage.target && !state.isPaused) {
+        triggerStageClear();
+        return;
       }
 
       const spawnRate = currentStage.spawnRate;
-      if (timestamp - state.lastSpawn > spawnRate) {
+      if (!state.isPaused && timestamp - state.lastSpawn > spawnRate) {
         spawnItem();
         state.lastSpawn = timestamp;
       }
@@ -948,7 +1059,7 @@
       });
 
       // Special Ending Particles
-      if (state.isEnding && Math.random() < 0.1) {
+      if (state.isEnding && Math.random() < 0.3) {
         createGoldLeaf(Math.random() * canvas.width, -20);
       }
 
