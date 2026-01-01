@@ -241,6 +241,68 @@
       /* Only show in game */
     }
 
+    /* Item Manifest Panel */
+    .item-manifest {
+      margin-top: 2rem;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      padding: 1.5rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      text-align: left;
+      width: 90%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .item-manifest h3 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      color: var(--gold);
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 0.5rem;
+    }
+
+    .manifest-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+    }
+
+    .manifest-emoji {
+      font-size: 1.5rem;
+      width: 2.5rem;
+      text-align: center;
+    }
+
+    .manifest-info {
+      flex: 1;
+      margin-left: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .manifest-rate {
+      font-size: 0.8rem;
+      opacity: 0.6;
+    }
+
+    .item-bad {
+      color: #ff6b6b;
+    }
+
+    .item-good {
+      color: #51cf66;
+    }
+
+    .item-rare {
+      color: var(--gold);
+    }
+
     /* Result Screen Styles */
     #resultView {
       background: var(--paper);
@@ -330,7 +392,33 @@
     </div>
     <div class="footer-container">
       <button class="btn-start" id="startBtn">開運! START</button>
-      <div class="instruction-badge">左右にスワイプしてお金を集めよう！</div>
+
+      <!-- Item Manifest -->
+      <div class="item-manifest">
+        <h3>招福アイテム図鑑</h3>
+        <div class="manifest-row item-rare">
+          <span class="manifest-emoji">✨</span>
+          <span class="manifest-info">奇跡の瑞光: +10,000円</span>
+          <span class="manifest-rate">出現率 5%</span>
+        </div>
+        <div class="manifest-row item-good">
+          <span class="manifest-emoji">💴</span>
+          <span class="manifest-info">開運紙幣: +1,000円</span>
+          <span class="manifest-rate">出現率 30%</span>
+        </div>
+        <div class="manifest-row">
+          <span class="manifest-emoji">🪙</span>
+          <span class="manifest-info">幸運硬貨: +500円</span>
+          <span class="manifest-rate">出現率 50%</span>
+        </div>
+        <div class="manifest-row item-bad">
+          <span class="manifest-emoji">💸</span>
+          <span class="manifest-info">不運の散札: -1,000円</span>
+          <span class="manifest-rate">出現率 15%</span>
+        </div>
+      </div>
+
+      <p class="instruction">左右にスワイプしてキャッチ！お金を集めよう！</p>
     </div>
   </div>
 
@@ -381,10 +469,10 @@
         { emoji: '✨', score: 10000, speed: 10, size: 35, weight: 5 }
       ],
       appraisals: [
-        { min: 50000, text: "伝説の大富豪！" },
-        { min: 30000, text: "大富豪級！" },
-        { min: 15000, text: "大判小判ザクザク！" },
-        { min: 5000, text: "なかなかの強運！" },
+        { min: 100000, text: "伝説の大富豪！" },
+        { min: 60000, text: "大富豪級！" },
+        { min: 30000, text: "大判小判ザクザク！" },
+        { min: 10000, text: "なかなかの強運！" },
         { min: 0, text: "開運の兆し！" }
       ]
     };
