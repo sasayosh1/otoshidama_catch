@@ -353,9 +353,12 @@
 
   <!-- Result View -->
   <div id="resultView" class="view">
-    <!-- Result Background Video: contain and align left to show face -->
-    <video id="resultBgVideo" src="cursor.mp4" loop muted playsinline class="bg-video"
+    <!-- Left Background Video -->
+    <video id="resultBgVideoLeft" src="cursor.mp4" loop muted playsinline class="bg-video"
       style="opacity: 0.3; object-fit: contain; object-position: -20% center; transform: scale(1.2);"></video>
+    <!-- Right Background Video -->
+    <video id="resultBgVideoRight" src="cursor.mp4" loop muted playsinline class="bg-video"
+      style="opacity: 0.3; object-fit: contain; object-position: 120% center; transform: scale(1.2);"></video>
 
     <!-- Solid background for the card section -->
     <div class="result-card" style="z-index: 20; background: var(--white); box-shadow: 0 30px 60px rgba(0,0,0,0.2);">
@@ -447,7 +450,8 @@
 
       $('startBtn').onclick = startGame;
       $('retryBtn').onclick = () => {
-        $('resultBgVideo').pause();
+        $('resultBgVideoLeft').pause();
+        $('resultBgVideoRight').pause();
         showView('opening');
       };
     }
@@ -495,7 +499,8 @@
       const appraisal = CONFIG.appraisals.find(a => state.score >= a.min);
       $('resultTitle').textContent = appraisal ? appraisal.text : "開運成就";
 
-      $('resultBgVideo').play();
+      $('resultBgVideoLeft').play();
+      $('resultBgVideoRight').play();
       showView('result');
     }
 
