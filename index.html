@@ -185,7 +185,7 @@
 
     /* Game Screen Styles */
     #gameView {
-      background: #000;
+      background: var(--paper);
     }
 
     #gameCanvas {
@@ -450,7 +450,7 @@
       state.timeLeft = CONFIG.gameTime;
       state.items = [];
       state.gameActive = true;
-      state.lastSpawn = Date.now();
+      state.lastSpawn = 0; // Reset to 0 to work with rAF timestamp
 
       $('scoreValue').textContent = '¥0';
       $('timeValue').textContent = state.timeLeft;
