@@ -681,9 +681,9 @@
         { min: 0, text: "開運の兆し！" }
       ],
       stages: [
-        { name: "壱の段: 平穏無事", target: 3000, speedMul: 1.0, spawnRate: 600, color: 'rgba(185, 28, 28, 0.1)', grid: 'rgba(212, 175, 55, 0.08)', invert: false },
-        { name: "弐の段: 千客万来", target: 10000, speedMul: 1.4, spawnRate: 450, color: 'rgba(212, 175, 55, 0.15)', grid: 'rgba(255, 255, 255, 0.1)', invert: false },
-        { name: "参の段: 波瀾万丈", target: 25000, speedMul: 1.8, spawnRate: 350, color: 'rgba(30, 58, 138, 0.2)', grid: 'rgba(255, 255, 255, 0.15)', invert: false },
+        { name: "壱の段: 平穏無事", target: 3000, speedMul: 1.0, spawnRate: 600, color: 'rgba(185, 28, 28, 0.4)', grid: 'rgba(212, 175, 55, 0.2)', invert: false },
+        { name: "弐の段: 千客万来", target: 10000, speedMul: 1.4, spawnRate: 450, color: 'rgba(212, 175, 55, 0.5)', grid: 'rgba(255, 255, 255, 0.2)', invert: false },
+        { name: "参の段: 波瀾万丈", target: 25000, speedMul: 1.8, spawnRate: 350, color: 'rgba(30, 58, 138, 0.3)', grid: 'rgba(255, 255, 255, 0.15)', invert: false },
         { name: "肆の段: 至難の業", target: 50000, speedMul: 2.2, spawnRate: 250, color: 'rgba(107, 33, 168, 0.25)', grid: 'rgba(212, 175, 55, 0.2)', invert: false },
         { name: "最終段: 真の暗闇", target: 100000, speedMul: 2.8, spawnRate: 150, color: 'rgba(0, 0, 0, 0.95)', grid: 'rgba(255, 255, 255, 0.02)', invert: true }
       ]
@@ -815,7 +815,7 @@
       showStageOverlay(`${kanji[index]}の段`, "スタート", "挑戦開始", () => {
         hideStageOverlay();
         startTimer();
-        if (index === 0) requestAnimationFrame(gameLoop);
+        requestAnimationFrame(gameLoop);
       });
     }
 
