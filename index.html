@@ -353,6 +353,8 @@
 
   <!-- Result View -->
   <div id="resultView" class="view">
+    <video id="resultBgVideo" src="cursor.mp4" loop muted playsinline class="bg-video" style="opacity: 0.1;"></video>
+    <div class="bg-overlay" style="background: rgba(255, 253, 240, 0.6);"></div>
     <div class="result-card">
       <div id="resultTitle" class="result-title">鑑定中...</div>
       <p>今年あなたが手にしたお年玉は</p>
@@ -441,7 +443,10 @@
       window.addEventListener('touchmove', handleMove, { passive: false });
 
       $('startBtn').onclick = startGame;
-      $('retryBtn').onclick = () => showView('opening');
+      $('retryBtn').onclick = () => {
+        $('resultBgVideo').pause();
+        showView('opening');
+      };
     }
 
     function resize() {
@@ -487,6 +492,7 @@
       const appraisal = CONFIG.appraisals.find(a => state.score >= a.min);
       $('resultTitle').textContent = appraisal ? appraisal.text : "開運成就";
 
+      $('resultBgVideo').play();
       showView('result');
     }
 
