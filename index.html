@@ -185,7 +185,7 @@
 
     /* Game Screen Styles */
     #gameView {
-      background: var(--paper);
+      background: #000;
     }
 
     #gameCanvas {
@@ -513,10 +513,10 @@
         ctx.translate(item.x, item.y);
         ctx.rotate(item.rotation);
 
-        // Shadow for premium feel
-        ctx.shadowColor = 'rgba(0,0,0,0.3)';
-        ctx.shadowBlur = 10;
-        ctx.shadowOffsetY = 5;
+        // Glow for visibility on black background
+        ctx.shadowColor = 'rgba(255, 230, 138, 0.5)';
+        ctx.shadowBlur = 15;
+        ctx.shadowOffsetY = 0;
 
         ctx.font = `${item.size}px Arial`;
         ctx.textAlign = 'center';
