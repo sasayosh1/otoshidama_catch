@@ -69,33 +69,47 @@
 
     /* Opening Screen Styles */
     #openingView {
-      padding: 3rem 1rem;
+      padding: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .scroll-content {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 1rem 5rem;
+      /* Extra bottom padding for scroll */
     }
 
     .header-container {
       position: relative;
-      z-index: 10;
-      margin-top: 5vh;
+      margin-top: 2vh;
       text-align: center;
       background: rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(12px);
-      padding: 2.5rem 2rem;
+      padding: 2rem 1.5rem;
       border-radius: 50%;
       border: 1px solid rgba(255, 255, 255, 0.3);
       animation: float 3s ease-in-out infinite;
-      width: 85vw;
-      height: 85vw;
-      max-width: 320px;
-      max-height: 320px;
+      width: 80vw;
+      height: 80vw;
+      max-width: 280px;
+      max-height: 280px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      flex-shrink: 0;
     }
 
     h1 {
-      font-size: clamp(1.8rem, 7vw, 2.8rem);
+      font-size: clamp(1.6rem, 6vw, 2.5rem);
       margin: 0;
       color: var(--white);
       font-weight: 900;
@@ -109,21 +123,20 @@
     }
 
     .subtitle {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       color: var(--gold-light);
       font-weight: bold;
-      margin-top: 0.5rem;
+      margin-top: 0.4rem;
       letter-spacing: 0.2rem;
     }
 
     .footer-container {
-      position: relative;
-      z-index: 10;
-      margin-bottom: 5vh;
+      width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 1.5rem;
+      margin-top: 2rem;
     }
 
     .btn-start {
@@ -268,14 +281,7 @@
       flex-direction: column;
       gap: 0.5rem;
       padding: 0 0.5rem;
-      overflow-y: auto;
-      scroll-snap-type: y mandatory;
-      -webkit-overflow-scrolling: touch;
       width: 100%;
-      max-height: 180px;
-      /* Constrain height for vertical scroll */
-      scrollbar-width: thin;
-      scrollbar-color: var(--gold) transparent;
     }
 
     .manifest-scroll::-webkit-scrollbar {
@@ -411,41 +417,42 @@
   <div id="openingView" class="view active">
     <!-- VIDEO is added via JS for better control -->
     <div class="bg-overlay"></div>
-    <div class="header-container">
-      <h1>お年玉<span>キャッチ</span></h1>
-      <div class="subtitle">2026 午年</div>
-    </div>
-    <div class="footer-container">
-      <button class="btn-start" id="startBtn">開運! START</button>
+    <div class="scroll-content">
+      <div class="header-container">
+        <h1>お年玉<span>キャッチ</span></h1>
+        <div class="subtitle">2026 午年</div>
+      </div>
+      <div class="footer-container">
+        <button class="btn-start" id="startBtn">開運! START</button>
 
-      <!-- Item Manifest (Vertical Scroll) -->
-      <div class="item-manifest">
-        <h3>招福アイテム図鑑</h3>
-        <div class="manifest-scroll">
-          <div class="manifest-card item-rare">
-            <span class="manifest-emoji">✨</span>
-            <span class="manifest-info">奇跡の瑞光: +10,000円</span>
-            <span class="manifest-rate">5%</span>
-          </div>
-          <div class="manifest-card item-good">
-            <span class="manifest-emoji">💴</span>
-            <span class="manifest-info">開運紙幣: +1,000円</span>
-            <span class="manifest-rate">30%</span>
-          </div>
-          <div class="manifest-card">
-            <span class="manifest-emoji">🪙</span>
-            <span class="manifest-info">幸運硬貨: +500円</span>
-            <span class="manifest-rate">50%</span>
-          </div>
-          <div class="manifest-card item-bad">
-            <span class="manifest-emoji">💸</span>
-            <span class="manifest-info">不運の散札: -1,000円</span>
-            <span class="manifest-rate">15%</span>
+        <!-- Item Manifest (Full content within scroll area) -->
+        <div class="item-manifest">
+          <h3>招福アイテム図鑑</h3>
+          <div class="manifest-scroll">
+            <div class="manifest-card item-rare">
+              <span class="manifest-emoji">✨</span>
+              <span class="manifest-info">奇跡の瑞光: +10,000円</span>
+              <span class="manifest-rate">5%</span>
+            </div>
+            <div class="manifest-card item-good">
+              <span class="manifest-emoji">💴</span>
+              <span class="manifest-info">開運紙幣: +1,000円</span>
+              <span class="manifest-rate">30%</span>
+            </div>
+            <div class="manifest-card">
+              <span class="manifest-emoji">🪙</span>
+              <span class="manifest-info">幸運硬貨: +500円</span>
+              <span class="manifest-rate">50%</span>
+            </div>
+            <div class="manifest-card item-bad">
+              <span class="manifest-emoji">💸</span>
+              <span class="manifest-info">不運の散札: -1,000円</span>
+              <span class="manifest-rate">15%</span>
+            </div>
           </div>
         </div>
+        <p class="instruction">上下にスワイプして図鑑を確認！<br>左右にスワイプしてお金を集めよう！</p>
       </div>
-
-      <p class="instruction">左右にスワイプしてキャッチ！お金を集めよう！</p>
     </div>
   </div>
 
