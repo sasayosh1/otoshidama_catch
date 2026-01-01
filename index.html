@@ -242,14 +242,21 @@
     /* Cursor (Video element) */
     #cursorVideo {
       position: absolute;
-      width: 120px;
-      height: 120px;
+      width: 80px;
+      height: 80px;
       pointer-events: none;
       z-index: 15;
       object-fit: contain;
       transform: translate(-50%, -50%);
       display: none;
       /* Only show in game */
+    }
+
+    @media (min-width: 768px) {
+      #cursorVideo {
+        width: 120px;
+        height: 120px;
+      }
     }
 
     /* Item Manifest Panel */
@@ -497,10 +504,10 @@
       gameTime: 30,
       spawnRate: 400, // ms
       items: [
-        { emoji: '🪙', score: 500, speed: 5, size: 40, weight: 50 },
-        { emoji: '💴', score: 1000, speed: 6, size: 45, weight: 30 },
-        { emoji: '💸', score: -1000, speed: 8, size: 50, weight: 15 },
-        { emoji: '✨', score: 10000, speed: 10, size: 35, weight: 5 }
+        { emoji: '🪙', score: 500, speed: 5, size: 30, weight: 50 },
+        { emoji: '💴', score: 1000, speed: 6, size: 35, weight: 30 },
+        { emoji: '💸', score: -1000, speed: 8, size: 40, weight: 15 },
+        { emoji: '✨', score: 10000, speed: 10, size: 28, weight: 5 }
       ],
       appraisals: [
         { min: 100000, text: "伝説の大富豪！" },
@@ -689,7 +696,8 @@
         const dx = item.x - hitX;
         const dy = item.y - (hitY - 20); // Focus on the mouth/top of the cursor
 
-        if (Math.abs(dx) < 60 && Math.abs(dy) < 60) {
+        const hitRadius = window.innerWidth < 768 ? 40 : 60;
+        if (Math.abs(dx) < hitRadius && Math.abs(dy) < hitRadius) {
           state.score += item.score;
           if (state.score < 0) state.score = 0; // Don't go below zero
           updateHUD();
