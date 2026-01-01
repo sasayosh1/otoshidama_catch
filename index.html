@@ -513,11 +513,6 @@
         ctx.translate(item.x, item.y);
         ctx.rotate(item.rotation);
 
-        // Glow for visibility on black background
-        ctx.shadowColor = 'rgba(255, 230, 138, 0.5)';
-        ctx.shadowBlur = 15;
-        ctx.shadowOffsetY = 0;
-
         ctx.font = `${item.size}px Arial`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
