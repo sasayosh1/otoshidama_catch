@@ -353,9 +353,12 @@
 
   <!-- Result View -->
   <div id="resultView" class="view">
-    <video id="resultBgVideo" src="cursor.mp4" loop muted playsinline class="bg-video" style="opacity: 0.1;"></video>
-    <div class="bg-overlay" style="background: rgba(255, 253, 240, 0.6);"></div>
-    <div class="result-card">
+    <!-- Result Background Video: contain and align left to show face -->
+    <video id="resultBgVideo" src="cursor.mp4" loop muted playsinline class="bg-video"
+      style="opacity: 0.3; object-fit: contain; object-position: -20% center; transform: scale(1.2);"></video>
+
+    <!-- Solid background for the card section -->
+    <div class="result-card" style="z-index: 20; background: var(--white); box-shadow: 0 30px 60px rgba(0,0,0,0.2);">
       <div id="resultTitle" class="result-title">鑑定中...</div>
       <p>今年あなたが手にしたお年玉は</p>
       <div id="finalScore" class="final-score">¥0</div>
