@@ -354,8 +354,8 @@
   <!-- Result View -->
   <div id="resultView" class="view">
     <div class="result-card">
-      <div class="result-title">福徳円満</div>
-      <p>今年あなたが手にした福徳は</p>
+      <div id="resultTitle" class="result-title">鑑定中...</div>
+      <p>今年あなたが手にしたお年玉は</p>
       <div id="finalScore" class="final-score">¥0</div>
       <button class="btn-retry" id="retryBtn">もう一度運試し</button>
     </div>
@@ -370,6 +370,12 @@
         { emoji: '💰', score: 100, speed: 4, size: 40 },
         { emoji: '🧧', score: 500, speed: 6, size: 50 },
         { emoji: '✨', score: 1000, speed: 8, size: 30 }
+      ],
+      appraisals: [
+        { min: 15000, text: "大富豪級！" },
+        { min: 10000, text: "大判小判ザクザク！" },
+        { min: 5000, text: "なかなかの強運！" },
+        { min: 0, text: "開運の兆し！" }
       ]
     };
 
@@ -476,6 +482,11 @@
       cursorVideo.pause();
       cursorVideo.style.display = 'none';
       $('finalScore').textContent = `¥${state.score.toLocaleString()}`;
+
+      // Dynamic Appraisal
+      const appraisal = CONFIG.appraisals.find(a => state.score >= a.min);
+      $('resultTitle').textContent = appraisal ? appraisal.text : "開運成就";
+
       showView('result');
     }
 
