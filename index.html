@@ -1,81 +1,573 @@
+<!DOCTYPE html>
+<html lang="ja">
 
-import React from 'react';
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>お年玉キャッチ 2026 | 開運招福</title>
+  <style>
+    :root {
+      --red: #b91c1c;
+      --red-dark: #7f1d1d;
+      --gold: #d4af37;
+      --gold-light: #fde68a;
+      --paper: #fffdf0;
+      --ink: #1a1a1a;
+      --white: #ffffff;
+    }
 
-interface OpeningScreenProps {
-  onStart: () => void;
-}
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-const OpeningScreen: React.FC<OpeningScreenProps> = ({ onStart }) => {
-  return (
-    <div className="relative w-full h-full flex flex-col items-center justify-between overflow-hidden p-8">
-      {/* 
-        New Japanese-style Background Layer
-        - Base: Creamy Washi color
-        - Overlay: Subtle gold gradients and patterns
-      */}
-      <div className="absolute inset-0 z-0 bg-[#fffdf0]">
-        {/* Washi Texture Overlay */}
-        <div className="absolute inset-0 opacity-40 bg-[url('https://www.transparenttextures.com/patterns/pinstripe-washi.png')]" />
-        
-        {/* Subtle Gold Cloud/Mist Patterns */}
-        <div className="absolute inset-0 opacity-30" 
-          style={{
-            backgroundImage: `
-              radial-gradient(circle at 20% 20%, #fde68a 0%, transparent 40%),
-              radial-gradient(circle at 80% 80%, #fde68a 0%, transparent 40%),
-              radial-gradient(circle at 50% 50%, #ffffff 0%, transparent 70%)
-            `
-          }} 
-        />
-        
-        {/* Decorative Gold Leaf Splatter (Abstract) */}
-        <div className="absolute inset-0 opacity-20 pointer-events-none"
-          style={{
-            background: 'radial-gradient(2px 2px at 10% 20%, #d4af37, transparent), radial-gradient(3px 3px at 30% 50%, #d4af37, transparent), radial-gradient(2px 2px at 70% 10%, #d4af37, transparent), radial-gradient(4px 4px at 90% 80%, #d4af37, transparent), radial-gradient(2px 2px at 40% 90%, #d4af37, transparent)'
-          }}
-        />
-      </div>
-      
-      {/* 
-        Header Content 
-        - Position, Size, and Colors preserved exactly from previous version
-      */}
-      <div className="relative z-20 mt-12 text-center">
-        <div className="inline-block bg-black/10 backdrop-blur-sm px-8 py-4 rounded-full border border-white/30">
-          <h1 className="text-5xl md:text-7xl font-festive text-white font-black drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] tracking-[0.2em]">
-            お年玉
-            <span className="text-yellow-400">キャッチ</span>
-          </h1>
-          <p className="text-2xl md:text-3xl font-bold text-yellow-300 mt-2 tracking-widest drop-shadow-md">
-            2026 午年
-          </p>
-        </div>
-      </div>
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--paper);
+      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    }
 
-      {/* 
-        Bottom Content 
-        - Button and instruction styling preserved exactly
-      */}
-      <div className="relative z-20 flex flex-col items-center gap-6 mb-12">
-        <button
-          onClick={onStart}
-          className="group relative px-16 py-8 bg-red-600 hover:bg-red-700 text-white text-4xl font-black rounded-full transition-all transform hover:scale-110 active:scale-95 shadow-[0_10px_0_rgb(153,27,27)] hover:shadow-[0_5px_0_rgb(153,27,27)] hover:translate-y-1 overflow-hidden border-4 border-yellow-400"
-        >
-          <span className="relative z-10 tracking-[0.3em]">開運! START</span>
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-        </button>
-        
-        <div className="bg-white/80 backdrop-blur-md px-6 py-2 rounded-full shadow-lg border-2 border-red-500">
-          <p className="text-red-700 text-lg font-bold">
-            左右にスワイプしてお金を集めよう！
-          </p>
-        </div>
-      </div>
+    /* Views */
+    .view {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      transition: opacity 0.5s ease;
+      opacity: 0;
+    }
 
-      {/* Traditional Pattern Bottom Border */}
-      <div className="absolute bottom-0 w-full h-4 bg-gradient-to-r from-red-600 via-yellow-400 to-red-600 z-10" />
+    .view.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    /* Backgrounds */
+    .bg-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    .bg-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
+      z-index: 1;
+    }
+
+    /* Opening Screen Styles */
+    #openingView {
+      padding: 3rem 1rem;
+    }
+
+    .header-container {
+      position: relative;
+      z-index: 10;
+      margin-top: 10vh;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(8px);
+      padding: 1.5rem 2.5rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      margin: 0;
+      color: var(--white);
+      font-weight: 900;
+      letter-spacing: 0.2em;
+      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 span {
+      color: var(--gold-light);
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      color: var(--gold-light);
+      font-weight: bold;
+      margin-top: 0.5rem;
+      letter-spacing: 0.3em;
+    }
+
+    .footer-container {
+      position: relative;
+      z-index: 10;
+      margin-bottom: 5vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .btn-start {
+      position: relative;
+      padding: 1.5rem 4rem;
+      background: var(--red);
+      color: var(--white);
+      font-size: 2rem;
+      font-weight: 900;
+      border: 4px solid var(--gold);
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s transform;
+      box-shadow: 0 8px 0 var(--red-dark);
+      letter-spacing: 0.2em;
+      overflow: hidden;
+    }
+
+    .btn-start:hover {
+      background: #dc2626;
+      transform: scale(1.05) translateY(2px);
+      box-shadow: 0 6px 0 var(--red-dark);
+    }
+
+    .btn-start:active {
+      transform: scale(0.95) translateY(8px);
+      box-shadow: 0 0 0 var(--red-dark);
+    }
+
+    .btn-start::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transition: 0.5s;
+    }
+
+    .btn-start:hover::after {
+      left: 100%;
+      transition: 0.7s;
+    }
+
+    .instruction-badge {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(4px);
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      border: 2px solid var(--red);
+      color: var(--red-dark);
+      font-weight: 800;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Game Screen Styles */
+    #gameView {
+      background: #000;
+    }
+
+    #gameCanvas {
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+
+    .hud {
+      position: absolute;
+      top: env(safe-area-inset-top, 1rem);
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    .score-badge,
+    .time-badge {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      color: var(--white);
+      padding: 0.5rem 1.25rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .label {
+      font-size: 0.8rem;
+      opacity: 0.8;
+      margin-bottom: 2px;
+    }
+
+    .value {
+      font-size: 1.5rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Cursor (Video element) */
+    #cursorVideo {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      pointer-events: none;
+      z-index: 15;
+      object-fit: contain;
+      transform: translate(-50%, -50%);
+      display: none;
+      /* Only show in game */
+    }
+
+    /* Result Screen Styles */
+    #resultView {
+      background: var(--paper);
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .result-card {
+      background: var(--white);
+      padding: 3rem 2rem;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      border: 2px solid var(--gold);
+    }
+
+    .result-title {
+      font-size: 2.5rem;
+      color: var(--red);
+      font-weight: 900;
+      margin-bottom: 1rem;
+    }
+
+    .final-score {
+      font-size: 4rem;
+      font-weight: 900;
+      margin: 1.5rem 0;
+      color: var(--ink);
+    }
+
+    .btn-retry {
+      padding: 1rem 2.5rem;
+      background: var(--ink);
+      color: var(--white);
+      border: none;
+      border-radius: 9999px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .btn-retry:active {
+      transform: scale(0.95);
+    }
+
+    /* Particles/FX */
+    .flash {
+      position: fixed;
+      inset: 0;
+      background: white;
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .flash.active {
+      animation: flash-anim 0.4s ease-out;
+    }
+
+    @keyframes flash-anim {
+      0% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Flash Layer -->
+  <div id="flash" class="flash"></div>
+
+  <!-- Opening View -->
+  <div id="openingView" class="view active">
+    <!-- VIDEO is added via JS for better control -->
+    <div class="bg-overlay"></div>
+    <div class="header-container">
+      <h1>お年玉<span>キャッチ</span></h1>
+      <div class="subtitle">2026 午年</div>
     </div>
-  );
-};
+    <div class="footer-container">
+      <button class="btn-start" id="startBtn">開運! START</button>
+      <div class="instruction-badge">左右にスワイプしてお金を集めよう！</div>
+    </div>
+  </div>
 
-export default OpeningScreen;
+  <!-- Game View -->
+  <div id="gameView" class="view">
+    <div class="hud">
+      <div class="score-badge">
+        <div class="label">獲得金額</div>
+        <div id="scoreValue" class="value">¥0</div>
+      </div>
+      <div class="time-badge">
+        <div class="label">残り時間</div>
+        <div id="timeValue" class="value">30</div>
+      </div>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+    <!-- Player Cursor Video -->
+    <video id="cursorVideo" src="cursor.mp4" loop muted playsinline></video>
+  </div>
+
+  <!-- Result View -->
+  <div id="resultView" class="view">
+    <div class="result-card">
+      <div class="result-title">福徳円満</div>
+      <p>今年あなたが手にした福徳は</p>
+      <div id="finalScore" class="final-score">¥0</div>
+      <button class="btn-retry" id="retryBtn">もう一度運試し</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Config & State ---
+    const CONFIG = {
+      gameTime: 30,
+      spawnRate: 400, // ms
+      items: [
+        { emoji: '💰', score: 100, speed: 4, size: 40 },
+        { emoji: '🧧', score: 500, speed: 6, size: 50 },
+        { emoji: '✨', score: 1000, speed: 8, size: 30 }
+      ]
+    };
+
+    let state = {
+      view: 'opening',
+      score: 0,
+      timeLeft: CONFIG.gameTime,
+      playerX: 0,
+      items: [],
+      gameActive: false,
+      lastSpawn: 0
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const canvas = $('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const cursorVideo = $('cursorVideo');
+
+    // --- Audio Synthesis (Omikuji Style) ---
+    const Audio = {
+      ctx: null,
+      init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+      play(type) {
+        this.init();
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+        const o = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        o.connect(g); g.connect(this.ctx.destination);
+        const t = this.ctx.currentTime;
+        if (type === 'catch') {
+          o.type = 'sine'; o.frequency.setValueAtTime(880, t); o.frequency.exponentialRampToValueAtTime(1320, t + 0.1);
+          g.gain.setValueAtTime(0.1, t); g.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+          o.start(t); o.stop(t + 0.1);
+        } else if (type === 'start') {
+          o.type = 'triangle'; o.frequency.setValueAtTime(440, t); o.frequency.exponentialRampToValueAtTime(880, t + 0.3);
+          g.gain.setValueAtTime(0.2, t); g.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+          o.start(t); o.stop(t + 0.3);
+        }
+      }
+    };
+
+    // --- Game Logic ---
+    function init() {
+      resize();
+      window.addEventListener('resize', resize);
+
+      // Opening Video
+      const openingVideo = document.createElement('video');
+      openingVideo.src = 'opening.mp4';
+      openingVideo.className = 'bg-video';
+      openingVideo.loop = true;
+      openingVideo.muted = true;
+      openingVideo.playsInline = true;
+      $('openingView').prepend(openingVideo);
+      openingVideo.play();
+
+      // Controls
+      const handleMove = (e) => {
+        const x = e.touches ? e.touches[0].clientX : e.clientX;
+        state.playerX = x;
+      };
+      window.addEventListener('mousemove', handleMove);
+      window.addEventListener('touchmove', handleMove, { passive: false });
+
+      $('startBtn').onclick = startGame;
+      $('retryBtn').onclick = () => showView('opening');
+    }
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      state.playerX = canvas.width / 2;
+    }
+
+    function startGame() {
+      Audio.play('start');
+      state.score = 0;
+      state.timeLeft = CONFIG.gameTime;
+      state.items = [];
+      state.gameActive = true;
+      state.lastSpawn = Date.now();
+
+      $('scoreValue').textContent = '¥0';
+      $('timeValue').textContent = state.timeLeft;
+
+      showView('game');
+      cursorVideo.style.display = 'block';
+      cursorVideo.play();
+
+      requestAnimationFrame(gameLoop);
+
+      const timer = setInterval(() => {
+        state.timeLeft--;
+        $('timeValue').textContent = state.timeLeft;
+        if (state.timeLeft <= 0) {
+          clearInterval(timer);
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      state.gameActive = false;
+      cursorVideo.pause();
+      cursorVideo.style.display = 'none';
+      $('finalScore').textContent = `¥${state.score.toLocaleString()}`;
+      showView('result');
+    }
+
+    function showView(id) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      $(`${id}View`).classList.add('active');
+      state.view = id;
+    }
+
+    function spawnItem() {
+      const type = CONFIG.items[Math.floor(Math.random() * CONFIG.items.length)];
+      state.items.push({
+        x: Math.random() * (canvas.width - 40) + 20,
+        y: -50,
+        ...type
+      });
+    }
+
+    function gameLoop(timestamp) {
+      if (!state.gameActive) return;
+
+      if (timestamp - state.lastSpawn > CONFIG.spawnRate) {
+        spawnItem();
+        state.lastSpawn = timestamp;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw and Update Items
+      state.items.forEach((item, index) => {
+        item.y += item.speed;
+        item.rotation = (item.rotation || 0) + (item.rotSpeed || (Math.random() - 0.5) * 0.1);
+
+        ctx.save();
+        ctx.translate(item.x, item.y);
+        ctx.rotate(item.rotation);
+
+        // Shadow for premium feel
+        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetY = 5;
+
+        ctx.font = `${item.size}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(item.emoji, 0, 0);
+        ctx.restore();
+
+        // Collision Check (Hitbox around cursorVideo top)
+        const hitX = state.playerX;
+        const hitY = canvas.height - 100;
+        const dx = item.x - hitX;
+        const dy = item.y - (hitY - 20); // Focus on the mouth/top of the cursor
+
+        if (Math.abs(dx) < 60 && Math.abs(dy) < 60) {
+          state.score += item.score;
+          updateHUD();
+          state.items.splice(index, 1);
+          Audio.play('catch');
+          flash();
+          vibrate();
+        }
+
+        if (item.y > canvas.height + 100) {
+          state.items.splice(index, 1);
+        }
+      });
+
+      // Update Cursor Position
+      cursorVideo.style.left = `${state.playerX}px`;
+      cursorVideo.style.top = `${canvas.height - 100}px`;
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    function updateHUD() {
+      $('scoreValue').textContent = `¥${state.score.toLocaleString()}`;
+    }
+
+    function flash() {
+      const f = $('flash');
+      f.classList.remove('active');
+      void f.offsetWidth; // Trigger reflow
+      f.classList.add('active');
+    }
+
+    function vibrate() {
+      if ("vibrate" in navigator) navigator.vibrate(50);
+    }
+
+    window.onload = init;
+  </script>
+</body>
+
+</html>
