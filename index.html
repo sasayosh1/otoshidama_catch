@@ -1,0 +1,81 @@
+
+import React from 'react';
+
+interface OpeningScreenProps {
+  onStart: () => void;
+}
+
+const OpeningScreen: React.FC<OpeningScreenProps> = ({ onStart }) => {
+  return (
+    <div className="relative w-full h-full flex flex-col items-center justify-between overflow-hidden p-8">
+      {/* 
+        New Japanese-style Background Layer
+        - Base: Creamy Washi color
+        - Overlay: Subtle gold gradients and patterns
+      */}
+      <div className="absolute inset-0 z-0 bg-[#fffdf0]">
+        {/* Washi Texture Overlay */}
+        <div className="absolute inset-0 opacity-40 bg-[url('https://www.transparenttextures.com/patterns/pinstripe-washi.png')]" />
+        
+        {/* Subtle Gold Cloud/Mist Patterns */}
+        <div className="absolute inset-0 opacity-30" 
+          style={{
+            backgroundImage: `
+              radial-gradient(circle at 20% 20%, #fde68a 0%, transparent 40%),
+              radial-gradient(circle at 80% 80%, #fde68a 0%, transparent 40%),
+              radial-gradient(circle at 50% 50%, #ffffff 0%, transparent 70%)
+            `
+          }} 
+        />
+        
+        {/* Decorative Gold Leaf Splatter (Abstract) */}
+        <div className="absolute inset-0 opacity-20 pointer-events-none"
+          style={{
+            background: 'radial-gradient(2px 2px at 10% 20%, #d4af37, transparent), radial-gradient(3px 3px at 30% 50%, #d4af37, transparent), radial-gradient(2px 2px at 70% 10%, #d4af37, transparent), radial-gradient(4px 4px at 90% 80%, #d4af37, transparent), radial-gradient(2px 2px at 40% 90%, #d4af37, transparent)'
+          }}
+        />
+      </div>
+      
+      {/* 
+        Header Content 
+        - Position, Size, and Colors preserved exactly from previous version
+      */}
+      <div className="relative z-20 mt-12 text-center">
+        <div className="inline-block bg-black/10 backdrop-blur-sm px-8 py-4 rounded-full border border-white/30">
+          <h1 className="text-5xl md:text-7xl font-festive text-white font-black drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] tracking-[0.2em]">
+            お年玉
+            <span className="text-yellow-400">キャッチ</span>
+          </h1>
+          <p className="text-2xl md:text-3xl font-bold text-yellow-300 mt-2 tracking-widest drop-shadow-md">
+            2026 午年
+          </p>
+        </div>
+      </div>
+
+      {/* 
+        Bottom Content 
+        - Button and instruction styling preserved exactly
+      */}
+      <div className="relative z-20 flex flex-col items-center gap-6 mb-12">
+        <button
+          onClick={onStart}
+          className="group relative px-16 py-8 bg-red-600 hover:bg-red-700 text-white text-4xl font-black rounded-full transition-all transform hover:scale-110 active:scale-95 shadow-[0_10px_0_rgb(153,27,27)] hover:shadow-[0_5px_0_rgb(153,27,27)] hover:translate-y-1 overflow-hidden border-4 border-yellow-400"
+        >
+          <span className="relative z-10 tracking-[0.3em]">開運! START</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+        </button>
+        
+        <div className="bg-white/80 backdrop-blur-md px-6 py-2 rounded-full shadow-lg border-2 border-red-500">
+          <p className="text-red-700 text-lg font-bold">
+            左右にスワイプしてお金を集めよう！
+          </p>
+        </div>
+      </div>
+
+      {/* Traditional Pattern Bottom Border */}
+      <div className="absolute bottom-0 w-full h-4 bg-gradient-to-r from-red-600 via-yellow-400 to-red-600 z-10" />
+    </div>
+  );
+};
+
+export default OpeningScreen;
