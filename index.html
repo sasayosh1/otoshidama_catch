@@ -586,6 +586,11 @@
 	  <!-- Flash Layer -->
 	  <div id="flash" class="flash"></div>
 
+	  <!-- Background music (BGM) -->
+	  <audio id="bgmOpening" src="./opening.mp3" preload="auto" loop></audio>
+	  <audio id="bgmGameplay" src="./gameplay.mp3" preload="auto" loop></audio>
+	  <audio id="bgmEnding" src="./ending.mp3" preload="auto" loop></audio>
+
 	  <div class="bg-overlay"></div>
 
 	  <!-- Shared background video (opening/result/ending) -->
@@ -916,19 +921,76 @@
       }
     };
 
-    // --- Game Logic ---
-	    function init() {
+	    // --- Game Logic ---
+		    function init() {
 	      resize();
 	      window.addEventListener('resize', resize);
 
 	      // Preload item emoji assets early (prevents placeholder flicker on first spawns)
 	      CONFIG.items.forEach((it) => getEmojiAsset(it.emoji));
 
-	      // Start with shared background video visible on opening screen
-	      showView('opening');
+		      // Start with shared background video visible on opening screen
+		      showView('opening');
 
-      // Controls
-      const handleMove = (e) => {
+		      // BGM: iPhone Safari blocks autoplay; start BGM only after first user gesture.
+		      const bgm = {
+		        opening: document.getElementById('bgmOpening'),
+		        gameplay: document.getElementById('bgmGameplay'),
+		        ending: document.getElementById('bgmEnding')
+		      };
+
+		      let bgmEnabled = false;
+		      let currentBgmKey = null;
+
+		      function stopAllBgm() {
+		        Object.values(bgm).forEach((a) => {
+		          if (!a) return;
+		          try {
+		            a.pause();
+		            a.currentTime = 0;
+		          } catch { }
+		        });
+		      }
+
+		      function pickBgmKeyForView(viewId) {
+		        if (viewId === 'game') return 'gameplay';
+		        if (viewId === 'result' || viewId === 'ending') return 'ending';
+		        return 'opening';
+		      }
+
+		      async function playBgmForView(viewId) {
+		        if (!bgmEnabled) return;
+		        const key = pickBgmKeyForView(viewId);
+		        if (key === currentBgmKey) return;
+		        currentBgmKey = key;
+
+		        stopAllBgm();
+		        const track = bgm[key];
+		        if (!track) return;
+		        track.volume = 0.6;
+		        try {
+		          await track.play();
+		        } catch {
+		          // Ignore autoplay errors; user can interact again.
+		        }
+		      }
+
+		      // Expose to showView via closure (safe within init scope)
+		      window.__playBgmForView = playBgmForView;
+
+		      function enableBgmOnce() {
+		        if (bgmEnabled) return;
+		        bgmEnabled = true;
+		        playBgmForView(state.view);
+		        window.removeEventListener('pointerdown', enableBgmOnce, true);
+		        window.removeEventListener('touchstart', enableBgmOnce, true);
+		      }
+
+		      window.addEventListener('pointerdown', enableBgmOnce, true);
+		      window.addEventListener('touchstart', enableBgmOnce, true);
+
+	      // Controls
+	      const handleMove = (e) => {
         const x = e.touches ? e.touches[0].clientX : e.clientX;
         state.playerX = x;
       };
@@ -1086,16 +1148,21 @@
 		      }
 	    }
 
-	    function showView(id) {
+		    function showView(id) {
 	      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       $('openingView').classList.remove('active');
       $('gameView').classList.remove('active');
       $('endingView').classList.remove('active'); // Ensure ending view is hidden
       $('resultView').classList.remove('active');
 	      $(`${id}View`).classList.add('active');
-	      state.view = id;
+		      state.view = id;
 
-	      // Shared background video control:
+		      // BGM switch (if enabled via user gesture)
+		      if (typeof window.__playBgmForView === 'function') {
+		        window.__playBgmForView(id);
+		      }
+
+		      // Shared background video control:
 	      // Only show on opening/result/ending, never on game view.
 	      const bgLayer = document.getElementById('bgVideoLayer');
 	      const bgVideo = document.getElementById('bgVideo');
