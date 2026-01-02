@@ -665,15 +665,15 @@
 
   <script>
     // --- Config & State ---
-    const CONFIG = {
-      gameTime: 30,
-      spawnRate: 400, // ms
-      items: [
-        { emoji: '🪙', score: 500, speed: 5, size: 30, weight: 50 },
-        { emoji: '💴', score: 1000, speed: 6, size: 35, weight: 30 },
-        { emoji: '💸', score: -1000, speed: 8, size: 40, weight: 15 },
-        { emoji: '✨', score: 10000, speed: 10, size: 28, weight: 5 }
-      ],
+	    const CONFIG = {
+	      gameTime: 30,
+	      spawnRate: 400, // ms
+	      items: [
+	        { emoji: '🪙', fallback: 'COIN', score: 500, speed: 5, size: 30, weight: 50 },
+	        { emoji: '💴', fallback: '¥', score: 1000, speed: 6, size: 35, weight: 30 },
+	        { emoji: '💸', fallback: '×', score: -1000, speed: 8, size: 40, weight: 15 },
+	        { emoji: '✨', fallback: 'BONUS', score: 10000, speed: 10, size: 28, weight: 5 }
+	      ],
       appraisals: [
         { min: 100000, text: "伝説の大富豪！" },
         { min: 60000, text: "大富豪級！" },
@@ -707,10 +707,121 @@
       timerId: null
     };
 
-    const $ = (id) => document.getElementById(id);
-    const canvas = $('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const cursorVideo = $('cursorVideo');
+	    const $ = (id) => document.getElementById(id);
+	    const canvas = $('gameCanvas');
+	    const ctx = canvas.getContext('2d');
+	    const cursorVideo = $('cursorVideo');
+
+	    // --- Item rendering (robust across iPhone Safari) ---
+	    // Root cause of "black circles/blocks" on iPhone Safari is often:
+	    // - Emoji glyph missing/monochrome fallback when drawn via canvas text
+	    // To avoid device/font differences, we draw Twemoji PNGs when available.
+	    const DEBUG = new URLSearchParams(location.search).has('debug');
+	    const TWEMOJI_BASE = 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/';
+	    const emojiRenderState = new Map(); // emoji -> { status: 'loading'|'loaded'|'error', img, url }
+	    const debugOnce = new Set();
+
+	    function toCodePoints(str) {
+	      return Array.from(str || '').map((ch) => ch.codePointAt(0).toString(16));
+	    }
+
+	    function emojiToTwemojiFile(emoji) {
+	      // Twemoji uses codepoints joined by '-', without variation selectors (FE0F)
+	      return toCodePoints(emoji)
+	        .filter((cp) => cp !== 'fe0f')
+	        .join('-') + '.png';
+	    }
+
+	    function getEmojiAsset(emoji) {
+	      const existing = emojiRenderState.get(emoji);
+	      if (existing) return existing;
+
+	      const file = emojiToTwemojiFile(emoji);
+	      const url = TWEMOJI_BASE + file;
+	      const img = new Image();
+	      img.crossOrigin = 'anonymous';
+	      const entry = { status: 'loading', img, url };
+	      emojiRenderState.set(emoji, entry);
+
+	      img.onload = () => {
+	        entry.status = img.naturalWidth > 0 ? 'loaded' : 'error';
+	        if (DEBUG && !debugOnce.has(`load:${emoji}`)) {
+	          debugOnce.add(`load:${emoji}`);
+	          console.log('[item-emoji] loaded', { emoji, url, w: img.naturalWidth, h: img.naturalHeight });
+	        }
+	      };
+	      img.onerror = () => {
+	        entry.status = 'error';
+	        if (DEBUG && !debugOnce.has(`err:${emoji}`)) {
+	          debugOnce.add(`err:${emoji}`);
+	          console.log('[item-emoji] failed', { emoji, url });
+	        }
+	      };
+	      img.src = url;
+
+	      return entry;
+	    }
+
+	    function drawFallbackToken(ctx, item) {
+	      const r = Math.max(12, item.size * 0.45);
+	      ctx.beginPath();
+	      ctx.arc(0, 0, r, 0, Math.PI * 2);
+	      ctx.closePath();
+	      ctx.fillStyle = 'rgba(255,255,255,0.92)';
+	      ctx.fill();
+	      ctx.lineWidth = 2;
+	      ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+	      ctx.stroke();
+
+	      const label = String(item.fallback || '?');
+	      const fontSize = Math.max(10, Math.min(16, Math.floor(item.size * 0.45)));
+	      ctx.font = `700 ${fontSize}px system-ui, -apple-system, Segoe UI, sans-serif`;
+	      ctx.textAlign = 'center';
+	      ctx.textBaseline = 'middle';
+	      ctx.fillStyle = '#111';
+	      ctx.fillText(label, 0, 0);
+	    }
+
+	    function drawItem(ctx, item, stage) {
+	      // Each item draw must be isolated so canvas state can't leak.
+	      ctx.save();
+	      ctx.translate(item.x, item.y);
+	      ctx.rotate(item.rotation || 0);
+
+	      // Hard reset state (prevents blackening from filter/composite/alpha leaks).
+	      ctx.globalAlpha = 1;
+	      ctx.globalCompositeOperation = 'source-over';
+	      ctx.filter = 'none';
+
+	      const asset = getEmojiAsset(item.emoji);
+	      const size = item.size;
+
+	      if (DEBUG && !debugOnce.has(`draw:${item.emoji}`)) {
+	        debugOnce.add(`draw:${item.emoji}`);
+	        console.log('[item-draw] first', {
+	          emoji: item.emoji,
+	          stage: stage?.name,
+	          fillStyle: ctx.fillStyle,
+	          globalAlpha: ctx.globalAlpha,
+	          globalCompositeOperation: ctx.globalCompositeOperation,
+	          filter: ctx.filter,
+	          twemojiStatus: asset?.status,
+	          twemojiUrl: asset?.url
+	        });
+	      }
+
+	      if (asset.status === 'loaded') {
+	        ctx.imageSmoothingEnabled = true;
+	        ctx.drawImage(asset.img, -size / 2, -size / 2, size, size);
+	      } else if (asset.status === 'error') {
+	        drawFallbackToken(ctx, item);
+	      } else {
+	        // loading: show a visible placeholder (not black)
+	        drawFallbackToken(ctx, item);
+	      }
+
+	      ctx.restore();
+	    }
 
     // --- Audio Synthesis (Omikuji Style) ---
     const Audio = {
@@ -740,15 +851,18 @@
     };
 
     // --- Game Logic ---
-    function init() {
-      resize();
-      window.addEventListener('resize', resize);
+	    function init() {
+	      resize();
+	      window.addEventListener('resize', resize);
 
-      // Opening Video
-      const openingVideo = document.createElement('video');
-      openingVideo.src = 'opening.mp4';
-      openingVideo.className = 'bg-video';
-      openingVideo.loop = true;
+	      // Preload item emoji assets early (prevents placeholder flicker on first spawns)
+	      CONFIG.items.forEach((it) => getEmojiAsset(it.emoji));
+
+	      // Opening Video
+	      const openingVideo = document.createElement('video');
+	      openingVideo.src = 'opening.mp4';
+	      openingVideo.className = 'bg-video';
+	      openingVideo.loop = true;
       openingVideo.muted = true;
       openingVideo.playsInline = true;
       $('openingView').prepend(openingVideo);
@@ -939,7 +1053,7 @@
       });
     }
 
-    function gameLoop(timestamp) {
+	    function gameLoop(timestamp) {
       if (!state.gameActive && !state.isEnding) return;
 
       const currentStage = CONFIG.stages[state.stageIndex];
@@ -982,30 +1096,11 @@
         ctx.stroke();
       }
 
-      // Draw and Update Items
-      state.items.forEach((item, index) => {
-        item.y += item.speed * currentStage.speedMul;
-        item.rotation = (item.rotation || 0) + (item.rotSpeed || (Math.random() - 0.5) * 0.1);
-
-        ctx.save();
-        ctx.translate(item.x, item.y);
-        ctx.rotate(item.rotation);
-
-        // Use a color-emoji capable font stack; some browsers render emoji as "tofu" (black boxes)
-        // if a non-emoji font (e.g. Arial) is forced on canvas.
-        ctx.font = `${item.size}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Twemoji Mozilla",system-ui,sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-
-        // Stage 5 Specific Effect (Shadow Items)
-        if (currentStage.invert) {
-          ctx.filter = 'brightness(0) contrast(200%)';
-        } else {
-          ctx.filter = 'none';
-        }
-
-        ctx.fillText(item.emoji, 0, 0);
-        ctx.restore();
+	      // Draw and Update Items
+	      state.items.forEach((item, index) => {
+	        item.y += item.speed * currentStage.speedMul;
+	        item.rotation = (item.rotation || 0) + (item.rotSpeed || (Math.random() - 0.5) * 0.1);
+	        drawItem(ctx, item, currentStage);
 
         // Collision Check (Hitbox around cursorVideo top)
         const hitX = state.playerX;
