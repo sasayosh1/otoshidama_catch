@@ -468,7 +468,8 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding-top: 100vh;
+      /* Start the credits a bit sooner (about 2s earlier) without changing scroll speed */
+      padding-top: 85vh;
     }
 
     .credits-roll {
@@ -667,36 +668,40 @@
 	    </div>
 	  </div>
 
-	  <!-- Ending View -->
-	  <div id="endingView" class="view">
-	    <div class="ending-content">
-      <div class="credits-roll">
-        <div class="thank-you">謹賀新年 2026</div>
-        <div class="credit-item">
-          <div class="credit-label">企画・製作</div>
-          <div class="credit-value">お年玉キャッチ 2026 製作委員会</div>
-        </div>
-        <div class="credit-item">
-          <div class="credit-label">ビジュアル・演出</div>
-          <div class="credit-value">AI アシスタント</div>
-        </div>
-        <div class="credit-item">
-          <div class="credit-label">音楽・効果音</div>
-          <div class="credit-value">Web Audio シンセサイザー</div>
-        </div>
-        <div class="credit-item">
-          <div class="credit-label">Special Thanks</div>
-          <div class="credit-value">プレイヤーの皆様</div>
-        </div>
-        <div class="credit-item" style="margin-top: 50px;">
-          <button id="endToStartBtnScroll" class="btn-retry"
-            style="background: var(--gold); color: var(--ink);">表紙へ戻る</button>
-        </div>
-        <!-- Padding at bottom -->
-        <div style="height: 30vh;"></div>
-      </div>
-    </div>
-  </div>
+		  <!-- Ending View -->
+		  <div id="endingView" class="view">
+		    <div class="ending-content">
+		      <div class="credits-roll">
+		        <div class="thank-you">謹賀新年 2026</div>
+		        <div class="credit-item">
+		          <div class="credit-label">企画・製作</div>
+		          <div class="credit-value">お年玉キャッチ 2026 製作委員会</div>
+		        </div>
+		        <div class="credit-item">
+		          <div class="credit-label">ビジュアル・演出</div>
+		          <div class="credit-value">AI アシスタント</div>
+		        </div>
+		        <div class="credit-item">
+		          <div class="credit-label">音楽・効果音</div>
+		          <div class="credit-value">Web Audio シンセサイザー</div>
+		        </div>
+		        <div class="credit-item">
+		          <div class="credit-label">ゲームデザイン</div>
+		          <div class="credit-value">UI / UX</div>
+		        </div>
+		        <div class="credit-item">
+		          <div class="credit-label">Special Thanks</div>
+		          <div class="credit-value">プレイヤーの皆様</div>
+		        </div>
+		        <div class="credit-item" style="margin-top: 50px;">
+		          <button id="endToStartBtnScroll" class="btn-retry"
+		            style="background: var(--gold); color: var(--ink);">表紙へ戻る</button>
+		        </div>
+		        <!-- Padding at bottom -->
+		        <div style="height: 30vh;"></div>
+		      </div>
+		    </div>
+		  </div>
 
   <script>
     // --- Config & State ---
