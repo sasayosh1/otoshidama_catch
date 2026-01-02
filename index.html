@@ -396,10 +396,12 @@
     }
 
     .result-title {
-      font-size: 2.5rem;
+      font-size: clamp(1.7rem, 6vw, 2.2rem);
       color: var(--red);
       font-weight: 900;
       margin-bottom: 1rem;
+      white-space: nowrap;
+      line-height: 1.1;
     }
 
     .final-score {
@@ -661,13 +663,12 @@
 	      <div id="resultTitle" class="result-title">鑑定中...</div>
 	      <p>今年あなたが手にしたお年玉は</p>
 	      <div id="finalScore" class="final-score">¥0</div>
-	      <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-	        <button class="btn-retry" id="retryBtn">もう一度運試し</button>
-	        <button class="btn-retry" id="endingBtn"
-	          style="background: var(--gold); border-color: var(--gold-light);">終幕を見る</button>
-	      </div>
-	    </div>
-	  </div>
+		      <div style="display: flex; justify-content: center; margin-top: 20px;">
+		        <button class="btn-retry" id="endingBtn"
+		          style="background: var(--gold); border-color: var(--gold-light);">終幕を見る</button>
+		      </div>
+		    </div>
+		  </div>
 
 		  <!-- Ending View -->
 		  <div id="endingView" class="view">
@@ -947,9 +948,6 @@
       $('endToStartBtn').onclick = () => {
         location.reload();
       };
-	      $('retryBtn').onclick = () => {
-	        showView('opening');
-	      };
 	    }
 
     function resize() {
@@ -1025,7 +1023,7 @@
 
       const kanji = ["壱", "弐", "参", "肆", "最終"];
       const isLast = state.stageIndex === CONFIG.stages.length - 1;
-      showStageOverlay(`${kanji[state.stageIndex]}の段`, "クリア！", isLast ? "運勢鑑定へ" : "次へ進む", () => {
+      showStageOverlay(`${kanji[state.stageIndex]}の段`, "クリア！", isLast ? "獲得金額は･･･" : "次へ進む", () => {
         if (isLast) {
           endGame();
         } else {
