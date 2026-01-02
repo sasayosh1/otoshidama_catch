@@ -34,14 +34,15 @@
     }
 
     /* Views */
-    .view {
-      position: absolute;
-      inset: 0;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      transition: opacity 0.5s ease;
+	    .view {
+	      position: absolute;
+	      inset: 0;
+	      z-index: 10;
+	      display: none;
+	      flex-direction: column;
+	      align-items: center;
+	      justify-content: space-between;
+	      transition: opacity 0.5s ease;
       opacity: 0;
     }
 
@@ -50,7 +51,7 @@
       opacity: 1;
     }
 
-    /* Backgrounds */
+	    /* Backgrounds */
 	    .bg-video {
 	      position: fixed;
 	      inset: 0;
@@ -60,23 +61,13 @@
 	      z-index: 0;
 	    }
 
-	    /* Result background: single video (no seams) */
-	    .result-bg {
+	    /* Shared background video layer (opening/result/ending) */
+	    .bg-video-layer {
 	      position: fixed;
 	      inset: 0;
 	      z-index: 0;
 	      overflow: hidden;
 	      pointer-events: none;
-	    }
-
-	    .result-bg-video {
-	      position: absolute;
-	      left: 50%;
-	      top: 50%;
-	      transform: translate(-50%, -50%);
-	      width: 100%;
-	      height: 100%;
-	      object-fit: cover;
 	    }
 
 	    .bg-overlay {
@@ -213,16 +204,31 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
-    /* Game Screen Styles */
-    #gameView {
-      background: #000;
-    }
+	    /* Game Screen Styles */
+	    #gameView {
+	      background: #000;
+	    }
 
-    #gameCanvas {
-      width: 100%;
-      height: 100%;
-      touch-action: none;
-    }
+	    .stage-bg {
+	      position: fixed;
+	      inset: 0;
+	      z-index: 0;
+	      pointer-events: none;
+	      overflow: hidden;
+	      background-color: #000;
+	      background-repeat: no-repeat;
+	      background-position: center center;
+	      background-size: cover;
+	    }
+
+	    #gameCanvas {
+	      position: absolute;
+	      inset: 0;
+	      z-index: 5;
+	      width: 100%;
+	      height: 100%;
+	      touch-action: none;
+	    }
 
     .hud {
       position: absolute;
@@ -361,12 +367,12 @@
       color: var(--gold);
     }
 
-    /* Result Screen Styles */
-    #resultView {
-      background: var(--paper);
-      justify-content: center;
-      padding: 2rem;
-    }
+	    /* Result Screen Styles */
+	    #resultView {
+	      background: none;
+	      justify-content: center;
+	      padding: 2rem;
+	    }
 
 	    .result-card {
 	      position: relative;
@@ -439,15 +445,15 @@
       }
     }
 
-    /* Ending Credits */
-    #endingView {
-      background: #000;
-      color: white;
-      overflow: hidden;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
+	    /* Ending Credits */
+	    #endingView {
+	      background: none;
+	      color: white;
+	      overflow: hidden;
+	      align-items: center;
+	      justify-content: center;
+	      text-align: center;
+	    }
 
     .ending-content {
       position: relative;
@@ -566,7 +572,14 @@
   <!-- Opening View -->
   <div id="openingView" class="view active">
     <!-- VIDEO is added via JS for better control -->
-    <div class="bg-overlay"></div>
+	  <div class="bg-overlay"></div>
+
+	  <!-- Shared background video (opening/result/ending) -->
+	  <div id="bgVideoLayer" class="bg-video-layer" aria-hidden="true" style="display:none;">
+	    <video id="bgVideo" class="bg-video" autoplay muted loop playsinline preload="auto">
+	      <source src="./opening.mp4" type="video/mp4" />
+	    </video>
+	  </div>
     <div class="scroll-content">
       <div class="header-container">
         <h1>お年玉<span>キャッチ</span></h1>
@@ -606,12 +619,13 @@
     </div>
   </div>
 
-  <!-- Game View -->
-  <div id="gameView" class="view">
-    <div class="hud">
-      <div class="score-badge">
-        <div class="label">獲得金額 / 目標</div>
-        <div class="value"><span id="scoreValue">¥0</span> / <span id="targetValue">¥3,000</span></div>
+	  <!-- Game View -->
+	  <div id="gameView" class="view">
+	    <div id="stageBg" class="stage-bg" aria-hidden="true"></div>
+	    <div class="hud">
+	      <div class="score-badge">
+	        <div class="label">獲得金額 / 目標</div>
+	        <div class="value"><span id="scoreValue">¥0</span> / <span id="targetValue">¥3,000</span></div>
       </div>
       <div class="stage-info">
         <div id="stageName" style="color: var(--gold-light); font-weight: 900; font-size: 0.9rem;">STAGE 1</div>
@@ -636,11 +650,6 @@
 
 	  <!-- Result View -->
 	  <div id="resultView" class="view">
-	    <div id="result-bg" class="result-bg" aria-hidden="true">
-	      <video id="result-bg-video" class="result-bg-video" autoplay muted loop playsinline preload="auto">
-	        <source src="./opening.mp4" type="video/mp4" />
-	      </video>
-	    </div>
 	    <div class="result-card" style="background: var(--white); box-shadow: 0 30px 60px rgba(0,0,0,0.2);">
 	      <div id="resultTitle" class="result-title">鑑定中...</div>
 	      <p>今年あなたが手にしたお年玉は</p>
@@ -653,10 +662,9 @@
 	    </div>
 	  </div>
 
-  <!-- Ending View -->
-  <div id="endingView" class="view">
-    <video id="endingBgVideo" src="opening.mp4" loop muted playsinline class="bg-video" style="opacity: 0.2;"></video>
-    <div class="ending-content">
+	  <!-- Ending View -->
+	  <div id="endingView" class="view">
+	    <div class="ending-content">
       <div class="credits-roll">
         <div class="thank-you">謹賀新年 2026</div>
         <div class="credit-item">
@@ -880,15 +888,8 @@
 	      // Preload item emoji assets early (prevents placeholder flicker on first spawns)
 	      CONFIG.items.forEach((it) => getEmojiAsset(it.emoji));
 
-	      // Opening Video
-	      const openingVideo = document.createElement('video');
-	      openingVideo.src = 'opening.mp4';
-	      openingVideo.className = 'bg-video';
-	      openingVideo.loop = true;
-      openingVideo.muted = true;
-      openingVideo.playsInline = true;
-      $('openingView').prepend(openingVideo);
-      openingVideo.play();
+	      // Start with shared background video visible on opening screen
+	      showView('opening');
 
       // Controls
       const handleMove = (e) => {
@@ -916,11 +917,6 @@
         location.reload();
       };
 	      $('retryBtn').onclick = () => {
-	        const resultBgVideo = document.getElementById('result-bg-video');
-	        if (resultBgVideo) {
-	          resultBgVideo.pause();
-	          resultBgVideo.currentTime = 0;
-	        }
 	        showView('opening');
 	      };
 	    }
@@ -931,9 +927,9 @@
       state.playerX = canvas.width / 2;
     }
 
-    function startStage(index) {
-      state.stageIndex = index;
-      const stage = CONFIG.stages[index];
+	    function startStage(index) {
+	      state.stageIndex = index;
+	      const stage = CONFIG.stages[index];
       state.timeLeft = CONFIG.gameTime;
       state.items = [];
       state.gameActive = true;
@@ -945,9 +941,10 @@
       $('scoreValue').textContent = `¥${state.score.toLocaleString()}`;
       $('timeValue').textContent = state.timeLeft;
 
-      // Show View & Overlay
-      showView('game');
-      cursorVideo.style.display = 'block';
+	      // Show View & Overlay
+	      showView('game');
+	      setStageBackground(index);
+	      cursorVideo.style.display = 'block';
       // Dynamically set blend mode: 'screen' for dark stages, 'normal' for bright stages
       cursorVideo.style.mixBlendMode = stage.invert ? 'screen' : 'normal';
       cursorVideo.play();
@@ -1008,8 +1005,8 @@
       });
     }
 
-    function endGame() {
-      state.gameActive = false;
+	    function endGame() {
+	      state.gameActive = false;
       cursorVideo.pause();
       cursorVideo.style.display = 'none';
       $('finalScore').textContent = `¥${state.score.toLocaleString()}`;
@@ -1020,25 +1017,14 @@
 
 	      // Show result view
 	      showView('result');
-
-	      // Result background video (single element to avoid seams)
-	      const resultBgVideo = document.getElementById('result-bg-video');
-	      if (resultBgVideo) {
-	        resultBgVideo.play().catch(() => {
-	          // Autoplay can still be blocked on some devices; keep UI usable regardless.
-	        });
-	      }
 	    }
 
-    function showEnding() {
-      state.gameActive = false;
-      state.isEnding = true;
-      showView('ending');
-      $('endingBgVideo').play();
+	    function showEnding() {
+	      state.gameActive = false;
+	      state.isEnding = true;
+	      showView('ending');
 
-      $('endingBgVideo').play();
-
-      // Setup click handler for the scroll button
+	      // Setup click handler for the scroll button
       const scrollBtn = document.getElementById('endToStartBtnScroll');
       if (scrollBtn) {
         scrollBtn.onclick = () => {
@@ -1047,15 +1033,71 @@
       }
     }
 
-    function showView(id) {
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+	    function showView(id) {
+	      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       $('openingView').classList.remove('active');
       $('gameView').classList.remove('active');
       $('endingView').classList.remove('active'); // Ensure ending view is hidden
       $('resultView').classList.remove('active');
-      $(`${id}View`).classList.add('active');
-      state.view = id;
-    }
+	      $(`${id}View`).classList.add('active');
+	      state.view = id;
+
+	      // Shared background video control:
+	      // Only show on opening/result/ending, never on game view.
+	      const bgLayer = document.getElementById('bgVideoLayer');
+	      const bgVideo = document.getElementById('bgVideo');
+	      const showBg = id === 'opening' || id === 'result' || id === 'ending';
+	      if (bgLayer) bgLayer.style.display = showBg ? 'block' : 'none';
+	      if (bgVideo) {
+	        bgVideo.style.opacity = id === 'ending' ? '0.2' : '1';
+	        if (showBg) bgVideo.play().catch(() => {});
+	        else bgVideo.pause();
+	      }
+	    }
+
+	    // --- Stage background images ---
+	    const STAGE_BACKGROUNDS = [
+	      './1.diamond-fuji.jpg',
+	      './2.akafuji.jpg',
+	      './3.fuji-tsuru.jpeg',
+	      './4.suibokuga.jpg',
+	      './5.uma.jpg'
+	    ];
+
+	    const stageBgEl = document.getElementById('stageBg');
+	    const stageBgCache = new Map(); // url -> 'ok' | 'fail'
+
+	    function setStageBackground(stageIndex) {
+	      if (!stageBgEl) return;
+	      const url = STAGE_BACKGROUNDS[stageIndex];
+	      if (!url) {
+	        stageBgEl.style.backgroundImage = 'none';
+	        return;
+	      }
+
+	      const cached = stageBgCache.get(url);
+	      if (cached === 'ok') {
+	        stageBgEl.style.backgroundImage = `url("${url}")`;
+	        return;
+	      }
+	      if (cached === 'fail') {
+	        stageBgEl.style.backgroundImage = 'none';
+	        console.warn('[stage-bg] missing background image:', url);
+	        return;
+	      }
+
+	      const img = new Image();
+	      img.onload = () => {
+	        stageBgCache.set(url, 'ok');
+	        stageBgEl.style.backgroundImage = `url("${url}")`;
+	      };
+	      img.onerror = () => {
+	        stageBgCache.set(url, 'fail');
+	        stageBgEl.style.backgroundImage = 'none';
+	        console.warn('[stage-bg] missing background image:', url);
+	      };
+	      img.src = url;
+	    }
 
     function spawnItem() {
       const totalWeight = CONFIG.items.reduce((sum, item) => sum + item.weight, 0);
@@ -1094,13 +1136,8 @@
         state.lastSpawn = timestamp;
       }
 
-      // Draw Dynamic Background
-      const pulse = Math.sin(timestamp / 500) * 0.1 + 0.9;
-      const grad = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width);
-      grad.addColorStop(0, currentStage.invert ? currentStage.color.replace('0.1', 0.1 * pulse) : currentStage.color);
-      grad.addColorStop(1, currentStage.bgOuter);
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+	      // Clear canvas; stage backgrounds are now handled by CSS (stageBg).
+	      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Subtle Moving Grid
       ctx.strokeStyle = currentStage.grid;
