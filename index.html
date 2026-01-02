@@ -53,11 +53,14 @@
 
 	    /* Backgrounds */
 	    .bg-video {
-	      position: fixed;
-	      inset: 0;
+	      position: absolute;
+	      left: 50%;
+	      top: 50%;
+	      transform: translate(-50%, -50%);
 	      width: 100%;
 	      height: 100%;
 	      object-fit: cover;
+	      object-position: center center;
 	      z-index: 0;
 	    }
 
@@ -68,6 +71,7 @@
 	      z-index: 0;
 	      overflow: hidden;
 	      pointer-events: none;
+	      background: #000;
 	    }
 
 	    .bg-overlay {
@@ -1049,7 +1053,7 @@
 	      const showBg = id === 'opening' || id === 'result' || id === 'ending';
 	      if (bgLayer) bgLayer.style.display = showBg ? 'block' : 'none';
 	      if (bgVideo) {
-	        bgVideo.style.opacity = id === 'ending' ? '0.2' : '1';
+	        bgVideo.style.opacity = id === 'ending' ? '0.45' : '1';
 	        if (showBg) bgVideo.play().catch(() => {});
 	        else bgVideo.pause();
 	      }
