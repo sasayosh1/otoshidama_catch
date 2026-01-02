@@ -991,7 +991,9 @@
         ctx.translate(item.x, item.y);
         ctx.rotate(item.rotation);
 
-        ctx.font = `${item.size}px Arial`;
+        // Use a color-emoji capable font stack; some browsers render emoji as "tofu" (black boxes)
+        // if a non-emoji font (e.g. Arial) is forced on canvas.
+        ctx.font = `${item.size}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Twemoji Mozilla",system-ui,sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
