@@ -51,21 +51,40 @@
     }
 
     /* Backgrounds */
-    .bg-video {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 0;
-    }
+	    .bg-video {
+	      position: fixed;
+	      inset: 0;
+	      width: 100%;
+	      height: 100%;
+	      object-fit: cover;
+	      z-index: 0;
+	    }
 
-    .bg-overlay {
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle at 50% 50%, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
-      z-index: 1;
-    }
+	    /* Result background: single video (no seams) */
+	    .result-bg {
+	      position: fixed;
+	      inset: 0;
+	      z-index: 0;
+	      overflow: hidden;
+	      pointer-events: none;
+	    }
+
+	    .result-bg-video {
+	      position: absolute;
+	      left: 50%;
+	      top: 50%;
+	      transform: translate(-50%, -50%);
+	      width: 100%;
+	      height: 100%;
+	      object-fit: cover;
+	    }
+
+	    .bg-overlay {
+	      position: fixed;
+	      inset: 0;
+	      background: radial-gradient(circle at 50% 50%, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
+	      z-index: 1;
+	    }
 
     /* Opening Screen Styles */
     #openingView {
@@ -349,12 +368,14 @@
       padding: 2rem;
     }
 
-    .result-card {
-      background: var(--white);
-      padding: 3rem 2rem;
-      border-radius: 24px;
-      width: 100%;
-      max-width: 400px;
+	    .result-card {
+	      position: relative;
+	      z-index: 20;
+	      background: var(--white);
+	      padding: 3rem 2rem;
+	      border-radius: 24px;
+	      width: 100%;
+	      max-width: 400px;
       text-align: center;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
       border: 2px solid var(--gold);
@@ -613,23 +634,24 @@
     </div>
   </div>
 
-  <!-- Result View -->
-  <div id="resultView" class="view">
-    <video id="resultBgVideoLeft" src="opening.mp4" loop muted playsinline class="bg-video"
-      style="object-position: 25% center; width: 50%; left: 0;"></video>
-    <video id="resultBgVideoRight" src="opening.mp4" loop muted playsinline class="bg-video"
-      style="object-position: 75% center; width: 50%; left: 50%;"></video>
-    <div class="result-card" style="z-index: 20; background: var(--white); box-shadow: 0 30px 60px rgba(0,0,0,0.2);">
-      <div id="resultTitle" class="result-title">鑑定中...</div>
-      <p>今年あなたが手にしたお年玉は</p>
-      <div id="finalScore" class="final-score">¥0</div>
-      <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-        <button class="btn-retry" id="retryBtn">もう一度運試し</button>
-        <button class="btn-retry" id="endingBtn"
-          style="background: var(--gold); border-color: var(--gold-light);">終幕を見る</button>
-      </div>
-    </div>
-  </div>
+	  <!-- Result View -->
+	  <div id="resultView" class="view">
+	    <div id="result-bg" class="result-bg" aria-hidden="true">
+	      <video id="result-bg-video" class="result-bg-video" autoplay muted loop playsinline preload="auto">
+	        <source src="./opening.mp4" type="video/mp4" />
+	      </video>
+	    </div>
+	    <div class="result-card" style="background: var(--white); box-shadow: 0 30px 60px rgba(0,0,0,0.2);">
+	      <div id="resultTitle" class="result-title">鑑定中...</div>
+	      <p>今年あなたが手にしたお年玉は</p>
+	      <div id="finalScore" class="final-score">¥0</div>
+	      <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+	        <button class="btn-retry" id="retryBtn">もう一度運試し</button>
+	        <button class="btn-retry" id="endingBtn"
+	          style="background: var(--gold); border-color: var(--gold-light);">終幕を見る</button>
+	      </div>
+	    </div>
+	  </div>
 
   <!-- Ending View -->
   <div id="endingView" class="view">
@@ -893,12 +915,15 @@
       $('endToStartBtn').onclick = () => {
         location.reload();
       };
-      $('retryBtn').onclick = () => {
-        $('resultBgVideoLeft').pause();
-        $('resultBgVideoRight').pause();
-        showView('opening');
-      };
-    }
+	      $('retryBtn').onclick = () => {
+	        const resultBgVideo = document.getElementById('result-bg-video');
+	        if (resultBgVideo) {
+	          resultBgVideo.pause();
+	          resultBgVideo.currentTime = 0;
+	        }
+	        showView('opening');
+	      };
+	    }
 
     function resize() {
       canvas.width = window.innerWidth;
@@ -993,18 +1018,17 @@
       const appraisal = CONFIG.appraisals.find(a => state.score >= a.min);
       $('resultTitle').textContent = appraisal ? appraisal.text : "開運成就";
 
-      // Show result view
-      showView('result');
+	      // Show result view
+	      showView('result');
 
-      // Use opening video as fallback if needed (handled in HTML but for robustness:)
-      const videos = [$('resultBgVideoLeft'), $('resultBgVideoRight')];
-      videos.forEach(v => {
-        v.play().catch(() => {
-          v.src = 'opening.mp4';
-          v.play();
-        });
-      });
-    }
+	      // Result background video (single element to avoid seams)
+	      const resultBgVideo = document.getElementById('result-bg-video');
+	      if (resultBgVideo) {
+	        resultBgVideo.play().catch(() => {
+	          // Autoplay can still be blocked on some devices; keep UI usable regardless.
+	        });
+	      }
+	    }
 
     function showEnding() {
       state.gameActive = false;
