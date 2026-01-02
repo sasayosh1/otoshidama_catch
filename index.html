@@ -476,15 +476,16 @@
       animation: roll 20s linear forwards;
     }
 
-    @keyframes roll {
-      0% {
-        transform: translateY(0);
-      }
+	    @keyframes roll {
+	      0% {
+	        transform: translateY(0);
+	      }
 
-      100% {
-        transform: translateY(-150vh);
-      }
-    }
+	      100% {
+	        /* Use element height to ensure the roll reaches the final button, regardless of line count. */
+	        transform: translateY(calc(-100% - 100vh));
+	      }
+	    }
 
     .credit-item {
       margin-bottom: 60px;
@@ -681,14 +682,14 @@
 		          <div class="credit-label">ビジュアル・演出</div>
 		          <div class="credit-value">AI アシスタント</div>
 		        </div>
-			        <div class="credit-item">
-			          <div class="credit-label">音楽・効果音</div>
-			          <div class="credit-value">Web Audio シンセサイザー</div>
-			        </div>
-			        <div class="credit-item">
-			          <div class="credit-label">ゲームデザイン</div>
-			          <div class="credit-value">UI / UX</div>
-			        </div>
+		        <div class="credit-item">
+		          <div class="credit-label">音楽・効果音</div>
+		          <div class="credit-value">とよのぶ</div>
+		        </div>
+		        <div class="credit-item">
+		          <div class="credit-label">ゲームデザイン</div>
+		          <div class="credit-value">とよのぶ</div>
+		        </div>
 			        <div class="credit-item">
 			          <div class="credit-label">システム設計</div>
 			          <div class="credit-value">ゲームループ・当たり判定</div>
