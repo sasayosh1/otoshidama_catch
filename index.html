@@ -500,10 +500,19 @@
       margin-bottom: 10px;
     }
 
-    .credit-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-    }
+	    .credit-value {
+	      font-size: 1.5rem;
+	      font-weight: 700;
+	    }
+
+	    #endToStartBtn {
+	      position: fixed;
+	      left: 50%;
+	      transform: translateX(-50%);
+	      bottom: env(safe-area-inset-bottom, 18px);
+	      z-index: 40;
+	      display: none;
+	    }
 
     .thank-you {
       font-size: 2.5rem;
@@ -670,60 +679,55 @@
 		    </div>
 		  </div>
 
-		  <!-- Ending View -->
-		  <div id="endingView" class="view">
-		    <div class="ending-content">
-		      <div class="credits-roll">
-		        <div class="thank-you">謹賀新年 2026</div>
-		        <div class="credit-item">
-		          <div class="credit-label">企画・製作</div>
-		          <div class="credit-value">お年玉キャッチ 2026 製作委員会</div>
-		        </div>
-		        <div class="credit-item">
-		          <div class="credit-label">ビジュアル・演出</div>
-		          <div class="credit-value">AI アシスタント</div>
-		        </div>
-		        <div class="credit-item">
-		          <div class="credit-label">音楽・効果音</div>
-		          <div class="credit-value">とよのぶ</div>
-		        </div>
-		        <div class="credit-item">
-		          <div class="credit-label">ゲームデザイン</div>
-		          <div class="credit-value">とよのぶ</div>
-		        </div>
+			  <!-- Ending View -->
+			  <div id="endingView" class="view">
+			    <div class="ending-content">
+			      <div class="credits-roll">
+			        <div class="thank-you">謹賀新年 2026</div>
 			        <div class="credit-item">
-			          <div class="credit-label">システム設計</div>
-			          <div class="credit-value">ゲームループ・当たり判定</div>
+			          <div class="credit-label">企画・製作</div>
+			          <div class="credit-value">とよのぶ</div>
 			        </div>
 			        <div class="credit-item">
-			          <div class="credit-label">ビジュアル素材</div>
-			          <div class="credit-value">富士の背景5点</div>
+			          <div class="credit-label">ビジュアル・演出</div>
+			          <div class="credit-value">とよのぶ</div>
 			        </div>
 			        <div class="credit-item">
-			          <div class="credit-label">演出</div>
-			          <div class="credit-value">エンドロール・フラッシュ</div>
+			          <div class="credit-label">音楽・効果音</div>
+			          <div class="credit-value">とよのぶ</div>
 			        </div>
 			        <div class="credit-item">
-			          <div class="credit-label">デバッグ</div>
-			          <div class="credit-value">iPhone Safari 最適化</div>
+			          <div class="credit-label">ゲームデザイン</div>
+			          <div class="credit-value">とよのぶ</div>
 			        </div>
-			        <div class="credit-item">
-			          <div class="credit-label">テストプレイ</div>
-			          <div class="credit-value">プレイヤーの皆様</div>
-			        </div>
-			        <div class="credit-item">
-			          <div class="credit-label">Special Thanks</div>
-			          <div class="credit-value">プレイヤーの皆様</div>
-			        </div>
-		        <div class="credit-item" style="margin-top: 50px;">
-		          <button id="endToStartBtnScroll" class="btn-retry"
-		            style="background: var(--gold); color: var(--ink);">表紙へ戻る</button>
-		        </div>
-		        <!-- Padding at bottom -->
-		        <div style="height: 30vh;"></div>
-		      </div>
-		    </div>
-		  </div>
+				        <div class="credit-item">
+				          <div class="credit-label">システム設計</div>
+				          <div class="credit-value">とよのぶ</div>
+				        </div>
+				        <div class="credit-item">
+				          <div class="credit-label">ビジュアル素材</div>
+				          <div class="credit-value">とよのぶ</div>
+				        </div>
+				        <div class="credit-item">
+				          <div class="credit-label">演出</div>
+				          <div class="credit-value">とよのぶ</div>
+				        </div>
+				        <div class="credit-item">
+				          <div class="credit-label">デバッグ</div>
+				          <div class="credit-value">とよのぶ</div>
+				        </div>
+				        <div class="credit-item">
+				          <div class="credit-label">テストプレイ</div>
+				          <div class="credit-value">とよのぶ</div>
+				        </div>
+				        <div class="credit-item">
+				          <div class="credit-label">Special Thanks</div>
+				          <div class="credit-value">とよのぶ</div>
+				        </div>
+			      </div>
+			    </div>
+			    <button id="endToStartBtn" class="btn-retry" style="background: var(--gold); color: var(--ink);">表紙へ戻る</button>
+			  </div>
 
   <script>
     // --- Config & State ---
@@ -1048,19 +1052,39 @@
 	      showView('result');
 	    }
 
-	    function showEnding() {
-	      state.gameActive = false;
-	      state.isEnding = true;
-	      showView('ending');
+		    function showEnding() {
+		      state.gameActive = false;
+		      state.isEnding = true;
+		      showView('ending');
 
-	      // Setup click handler for the scroll button
-      const scrollBtn = document.getElementById('endToStartBtnScroll');
-      if (scrollBtn) {
-        scrollBtn.onclick = () => {
-          location.reload();
-        };
-      }
-    }
+		      // Show "back to cover" only after credits fully roll out, then +1s.
+		      const endBtn = document.getElementById('endToStartBtn');
+		      if (endBtn) endBtn.style.display = 'none';
+
+		      const credits = document.querySelector('#endingView .credits-roll');
+		      if (credits) {
+		        // Restart animation so the timing is consistent on repeated runs.
+		        credits.style.animation = 'none';
+		        // Force reflow
+		        void credits.offsetHeight;
+		        credits.style.animation = 'roll 20s linear forwards';
+
+		        credits.addEventListener(
+		          'animationend',
+		          () => {
+		            window.setTimeout(() => {
+		              if (endBtn) endBtn.style.display = 'block';
+		            }, 1000);
+		          },
+		          { once: true }
+		        );
+		      } else {
+		        // Fallback: show after a reasonable delay.
+		        window.setTimeout(() => {
+		          if (endBtn) endBtn.style.display = 'block';
+		        }, 1000);
+		      }
+	    }
 
 	    function showView(id) {
 	      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
