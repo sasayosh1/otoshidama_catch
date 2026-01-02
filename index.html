@@ -268,26 +268,26 @@
       font-variant-numeric: tabular-nums;
     }
 
-    /* Cursor (Video element) */
-    #cursorVideo {
-      position: absolute;
-      width: 80px;
-      height: 80px;
-      pointer-events: none;
-      z-index: 15;
-      object-fit: contain;
-      transform: translate(-50%, -50%);
-      /* Removed static mix-blend-mode: screen; to handle dynamically in JS */
-      display: none;
-      /* Only show in game */
-    }
+	    /* Cursor (GIF) */
+	    #cursorImg {
+	      position: absolute;
+	      width: 80px;
+	      height: 80px;
+	      pointer-events: none;
+	      z-index: 15;
+	      object-fit: contain;
+	      transform: translate(-50%, -50%);
+	      /* Removed static mix-blend-mode: screen; to handle dynamically in JS */
+	      display: none;
+	      /* Only show in game */
+	    }
 
-    @media (min-width: 768px) {
-      #cursorVideo {
-        width: 120px;
-        height: 120px;
-      }
-    }
+	    @media (min-width: 768px) {
+	      #cursorImg {
+	        width: 120px;
+	        height: 120px;
+	      }
+	    }
 
     /* Item Manifest Panel */
     .item-manifest {
@@ -660,8 +660,8 @@
       </div>
     </div>
     <canvas id="gameCanvas"></canvas>
-    <!-- Player Cursor Video -->
-    <video id="cursorVideo" src="cursor.mp4" loop muted playsinline></video>
+	    <!-- Player Cursor -->
+	    <img id="cursorImg" src="cursor2.gif" alt="" />
 
     <!-- Stage Overlay -->
     <div id="stageOverlay">
@@ -781,7 +781,7 @@
 	    const $ = (id) => document.getElementById(id);
 	    const canvas = $('gameCanvas');
 	    const ctx = canvas.getContext('2d');
-	    const cursorVideo = $('cursorVideo');
+	    const cursorImg = $('cursorImg');
 
 	    // --- Item rendering (robust across iPhone Safari) ---
 	    // Root cause of "black circles/blocks" on iPhone Safari is often:
@@ -1045,10 +1045,9 @@
 	      // Show View & Overlay
 	      showView('game');
 	      setStageBackground(index);
-	      cursorVideo.style.display = 'block';
-      // Dynamically set blend mode: 'screen' for dark stages, 'normal' for bright stages
-      cursorVideo.style.mixBlendMode = stage.invert ? 'screen' : 'normal';
-      cursorVideo.play();
+	      cursorImg.style.display = 'block';
+	      // Dynamically set blend mode: 'screen' for dark stages, 'normal' for bright stages
+	      cursorImg.style.mixBlendMode = stage.invert ? 'screen' : 'normal';
 
       // Stage Start Overlay
       const kanji = ["壱", "弐", "参", "肆", "最終"];
@@ -1108,8 +1107,7 @@
 
 	    function endGame() {
 	      state.gameActive = false;
-      cursorVideo.pause();
-      cursorVideo.style.display = 'none';
+	      cursorImg.style.display = 'none';
       $('finalScore').textContent = `¥${state.score.toLocaleString()}`;
 
       // Dynamic Appraisal
@@ -1366,8 +1364,8 @@
       ctx.filter = 'none'; // Clear filter
 
       // Update Cursor Position
-      cursorVideo.style.left = `${state.playerX}px`;
-      cursorVideo.style.top = `${canvas.height - 100}px`;
+      cursorImg.style.left = `${state.playerX}px`;
+      cursorImg.style.top = `${canvas.height - 100}px`;
 
       requestAnimationFrame(gameLoop);
     }
