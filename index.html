@@ -984,10 +984,16 @@
 		        playBgmForView(state.view);
 		        window.removeEventListener('pointerdown', enableBgmOnce, true);
 		        window.removeEventListener('touchstart', enableBgmOnce, true);
+		        window.removeEventListener('click', enableBgmOnce, true);
+		        window.removeEventListener('touchend', enableBgmOnce, true);
 		      }
 
 		      window.addEventListener('pointerdown', enableBgmOnce, true);
 		      window.addEventListener('touchstart', enableBgmOnce, true);
+		      // iOS Safari sometimes won't allow audio start on touchstart during scroll;
+		      // add end/click events as a more reliable "user gesture" to unlock audio.
+		      window.addEventListener('click', enableBgmOnce, true);
+		      window.addEventListener('touchend', enableBgmOnce, true);
 
 	      // Controls
 	      const handleMove = (e) => {
