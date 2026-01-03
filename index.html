@@ -268,8 +268,8 @@
       font-variant-numeric: tabular-nums;
     }
 
-	    /* Cursor (GIF) */
-	    #cursorImg {
+	    /* Cursor (Video element) */
+	    #cursorVideo {
 	      position: absolute;
 	      width: 80px;
 	      height: 80px;
@@ -283,7 +283,7 @@
 	    }
 
 	    @media (min-width: 768px) {
-	      #cursorImg {
+	      #cursorVideo {
 	        width: 120px;
 	        height: 120px;
 	      }
@@ -660,8 +660,8 @@
       </div>
     </div>
     <canvas id="gameCanvas"></canvas>
-	    <!-- Player Cursor -->
-	    <img id="cursorImg" src="cursor2.gif" alt="" />
+	    <!-- Player Cursor Video -->
+	    <video id="cursorVideo" src="cursor.mp4" loop muted playsinline></video>
 
     <!-- Stage Overlay -->
     <div id="stageOverlay">
@@ -781,7 +781,7 @@
 	    const $ = (id) => document.getElementById(id);
 	    const canvas = $('gameCanvas');
 	    const ctx = canvas.getContext('2d');
-	    const cursorImg = $('cursorImg');
+	    const cursorVideo = $('cursorVideo');
 
 	    // --- Item rendering (robust across iPhone Safari) ---
 	    // Root cause of "black circles/blocks" on iPhone Safari is often:
@@ -1045,9 +1045,10 @@
 	      // Show View & Overlay
 	      showView('game');
 	      setStageBackground(index);
-	      cursorImg.style.display = 'block';
+	      cursorVideo.style.display = 'block';
 	      // Dynamically set blend mode: 'screen' for dark stages, 'normal' for bright stages
-	      cursorImg.style.mixBlendMode = stage.invert ? 'screen' : 'normal';
+	      cursorVideo.style.mixBlendMode = stage.invert ? 'screen' : 'normal';
+	      cursorVideo.play();
 
       // Stage Start Overlay
       const kanji = ["壱", "弐", "参", "肆", "最終"];
@@ -1107,7 +1108,8 @@
 
 	    function endGame() {
 	      state.gameActive = false;
-	      cursorImg.style.display = 'none';
+	      cursorVideo.pause();
+	      cursorVideo.style.display = 'none';
       $('finalScore').textContent = `¥${state.score.toLocaleString()}`;
 
       // Dynamic Appraisal
@@ -1364,8 +1366,8 @@
       ctx.filter = 'none'; // Clear filter
 
       // Update Cursor Position
-      cursorImg.style.left = `${state.playerX}px`;
-      cursorImg.style.top = `${canvas.height - 100}px`;
+      cursorVideo.style.left = `${state.playerX}px`;
+      cursorVideo.style.top = `${canvas.height - 100}px`;
 
       requestAnimationFrame(gameLoop);
     }
