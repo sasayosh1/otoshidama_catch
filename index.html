@@ -939,18 +939,20 @@
 		        ending: document.getElementById('bgmEnding')
 		      };
 
-		      let bgmEnabled = false;
-		      let currentBgmKey = null;
+			      let bgmEnabled = false;
+			      let currentBgmKey = null;
+			      let desiredBgmKey = null;
 
-		      function stopAllBgm() {
-		        Object.values(bgm).forEach((a) => {
-		          if (!a) return;
-		          try {
-		            a.pause();
-		            a.currentTime = 0;
-		          } catch { }
-		        });
-		      }
+			      function stopOtherBgm(keepKey) {
+			        Object.entries(bgm).forEach(([k, a]) => {
+			          if (!a) return;
+			          if (k === keepKey) return;
+			          try {
+			            a.pause();
+			            a.currentTime = 0;
+			          } catch { }
+			        });
+			      }
 
 		      function pickBgmKeyForView(viewId) {
 		        if (viewId === 'game') return 'gameplay';
@@ -958,35 +960,40 @@
 		        return 'opening';
 		      }
 
-		      async function playBgmForView(viewId) {
-		        if (!bgmEnabled) return;
-		        const key = pickBgmKeyForView(viewId);
-		        if (key === currentBgmKey) return;
-		        currentBgmKey = key;
+			      async function playBgmForView(viewId) {
+			        const key = pickBgmKeyForView(viewId);
+			        desiredBgmKey = key;
+			        if (!bgmEnabled) return;
 
-		        stopAllBgm();
-		        const track = bgm[key];
-		        if (!track) return;
-		        track.volume = 0.6;
-		        try {
-		          await track.play();
-		        } catch {
-		          // Ignore autoplay errors; user can interact again.
-		        }
-		      }
+			        const track = bgm[key];
+			        if (!track) return;
+
+			        // If we already wanted this track but it is not actually playing (iOS can reject play()),
+			        // try again on the next eligible call.
+			        if (currentBgmKey === key && !track.paused) return;
+
+			        stopOtherBgm(key);
+			        track.volume = 0.6;
+			        try {
+			          await track.play();
+			          currentBgmKey = key;
+			        } catch {
+			          // Keep currentBgmKey unchanged so we can retry later (e.g. on another tap).
+			        }
+			      }
 
 		      // Expose to showView via closure (safe within init scope)
 		      window.__playBgmForView = playBgmForView;
 
-		      function enableBgmOnce() {
-		        if (bgmEnabled) return;
-		        bgmEnabled = true;
-		        playBgmForView(state.view);
-		        window.removeEventListener('pointerdown', enableBgmOnce, true);
-		        window.removeEventListener('touchstart', enableBgmOnce, true);
-		        window.removeEventListener('click', enableBgmOnce, true);
-		        window.removeEventListener('touchend', enableBgmOnce, true);
-		      }
+			      function enableBgmOnce() {
+			        if (bgmEnabled) return;
+			        bgmEnabled = true;
+			        playBgmForView(state.view);
+			        window.removeEventListener('pointerdown', enableBgmOnce, true);
+			        window.removeEventListener('touchstart', enableBgmOnce, true);
+			        window.removeEventListener('click', enableBgmOnce, true);
+			        window.removeEventListener('touchend', enableBgmOnce, true);
+			      }
 
 		      window.addEventListener('pointerdown', enableBgmOnce, true);
 		      window.addEventListener('touchstart', enableBgmOnce, true);
